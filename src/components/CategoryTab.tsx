@@ -50,7 +50,7 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
         <h3 className="col-span-4 text-right font-semibold">ACTUAL</h3>
       </div>
 
-      {items.map((item) => (
+      {items.map((item, index) => (
         <div key={item.id} className="flex items-center gap-2">
           <BudgetRow
             label={item.label}
@@ -58,6 +58,7 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
             actualValue={item.actual}
             onBudgetChange={(value) => updateItem(item.id, { budget: value })}
             onActualChange={(value) => updateItem(item.id, { actual: value })}
+            index={index}
           />
           <Button
             variant="ghost"

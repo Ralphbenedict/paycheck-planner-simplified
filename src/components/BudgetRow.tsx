@@ -12,6 +12,7 @@ interface BudgetRowProps {
   isCheckbox?: boolean;
   checked?: boolean;
   onCheckChange?: (checked: boolean) => void;
+  index?: number;
 }
 
 const BudgetRow = ({
@@ -23,6 +24,7 @@ const BudgetRow = ({
   isCheckbox = false,
   checked,
   onCheckChange,
+  index = 0,
 }: BudgetRowProps) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -56,12 +58,16 @@ const BudgetRow = ({
     const budgetState = getValueState(budgetValue);
     const actualState = getValueState(actualValue);
     
+    const isEven = index % 2 === 0;
+    
     return {
       row: cn(
         "grid grid-cols-12 gap-4 mb-2 items-center p-2 rounded-lg transition-colors",
         {
           "hover:bg-gray-50": true,
           "bg-gray-50": label === "BALANCE",
+          "bg-gradient-to-r from-[#fdfcfb] to-[#e2d1c3]/20": isEven && label !== "BALANCE",
+          "bg-gradient-to-r from-[#e6e9f0] to-[#eef1f5]/20": !isEven && label !== "BALANCE",
         }
       ),
       budget: cn("relative", {
