@@ -13,7 +13,7 @@ interface SummaryData {
 
 interface BudgetSummaryProps {
   summaryData: SummaryData;
-  setSummaryData: React.Dispatch<React.SetStateAction<SummaryData>>;
+  setSummaryData: (data: SummaryData) => void;
   rollover: boolean;
   setRollover: (value: boolean) => void;
 }

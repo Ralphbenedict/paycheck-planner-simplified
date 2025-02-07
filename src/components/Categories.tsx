@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CategoryTab from "./CategoryTab";
@@ -20,7 +19,7 @@ interface CategoryItems {
 
 interface CategoriesProps {
   categoryItems: CategoryItems;
-  setCategoryItems: React.Dispatch<React.SetStateAction<CategoryItems>>;
+  setCategoryItems: (items: CategoryItems) => void;
 }
 
 const Categories = ({ categoryItems, setCategoryItems }: CategoriesProps) => {
