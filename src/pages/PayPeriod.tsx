@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BudgetSection from "@/components/BudgetSection";
 import DateRangePicker from "@/components/DateRangePicker";
 import BudgetSummary from "@/components/BudgetSummary";
 import Categories from "@/components/Categories";
+import BudgetGraphs from "@/components/BudgetGraphs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -76,6 +76,21 @@ const PayPeriod = () => {
     localStorage.setItem(`period_${id}`, JSON.stringify(periodData));
   }, [periodData, id]);
 
+  const calculateTotals = () => {
+    const income = periodData.summaryData.income;
+    const totalIncome = income.budget;
+    
+    const totalBudgeted = Object.entries(periodData.summaryData)
+      .filter(([key]) => key !== 'income' && key !== 'rollover')
+      .reduce((sum, [_, value]) => sum + value.budget, 0);
+    
+    const totalActual = Object.entries(periodData.summaryData)
+      .filter(([key]) => key !== 'income' && key !== 'rollover')
+      .reduce((sum, [_, value]) => sum + value.actual, 0);
+
+    return { totalIncome, totalBudgeted, totalActual };
+  };
+
   return (
     <div className="container py-8 max-w-4xl">
       <Button
@@ -112,6 +127,10 @@ const PayPeriod = () => {
             setPeriodData({ ...periodData, rollover: value })
           }
         />
+      </BudgetSection>
+
+      <BudgetSection title="BUDGET OVERVIEW">
+        <BudgetGraphs {...calculateTotals()} />
       </BudgetSection>
 
       <BudgetSection title="CATEGORIES">
