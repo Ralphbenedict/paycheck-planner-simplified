@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -26,16 +27,17 @@ const BudgetRow = ({
   onCheckChange,
   index = 0,
 }: BudgetRowProps) => {
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
+  const formatValue = (value: number) => {
+    return value === 0 ? "" : value.toFixed(2);
   };
 
   const handleValueChange = (value: string, onChange: (value: number) => void) => {
+    // If empty string, set to 0
+    if (!value) {
+      onChange(0);
+      return;
+    }
+
     // Remove any non-numeric characters except decimal point
     const numericValue = value.replace(/[^0-9.]/g, '');
     
@@ -104,7 +106,7 @@ const BudgetRow = ({
         </span>
         <Input
           type="text"
-          value={budgetValue.toFixed(2)}
+          value={formatValue(budgetValue)}
           onChange={(e) => handleValueChange(e.target.value, onBudgetChange)}
           className={cn("text-right pl-6", {
             "font-semibold": label === "BALANCE",
@@ -117,7 +119,7 @@ const BudgetRow = ({
         </span>
         <Input
           type="text"
-          value={actualValue.toFixed(2)}
+          value={formatValue(actualValue)}
           onChange={(e) => handleValueChange(e.target.value, onActualChange)}
           className={cn("text-right pl-6", {
             "font-semibold": label === "BALANCE",
