@@ -42,9 +42,13 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <DollarSign className="w-6 h-6 mb-1 text-gray-600" />
-            <span className="text-2xl font-bold text-[#222222]">
-              {amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
+            <DollarSign className="w-5 h-5 mb-1 text-gray-600" />
+            <span className="text-xl font-bold text-[#222222]">
+              {amount.toLocaleString('en-US', { 
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+                useGrouping: true
+              })}
             </span>
             <span className="text-sm text-gray-600">
               {title.toLowerCase()}
