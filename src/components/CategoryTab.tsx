@@ -87,13 +87,34 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
       </Button>
 
       <div className="border-t pt-4 mt-4">
-        <BudgetRow
-          label="BALANCE"
-          budgetValue={totalBudget}
-          actualValue={totalActual}
-          onBudgetChange={() => {}}
-          onActualChange={() => {}}
-        />
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-4">
+            <h3 className="font-semibold">BALANCE</h3>
+          </div>
+          <div className="col-span-3">
+            <div className="bg-gray-50 rounded-md">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="text"
+                value={totalBudget.toFixed(2)}
+                readOnly
+                className="w-full px-6 py-2 text-right bg-transparent font-semibold"
+              />
+            </div>
+          </div>
+          <div className="col-span-3">
+            <div className="bg-gray-50 rounded-md">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+              <input
+                type="text"
+                value={totalActual.toFixed(2)}
+                readOnly
+                className="w-full px-6 py-2 text-right bg-transparent font-semibold"
+              />
+            </div>
+          </div>
+          <div className="col-span-2"></div>
+        </div>
       </div>
     </div>
   );
