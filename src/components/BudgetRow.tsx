@@ -1,6 +1,7 @@
 import React from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { cn } from "@/lib/utils";
 
 interface BudgetRowProps {
   label: string;
@@ -45,8 +46,41 @@ const BudgetRow = ({
     onChange(numberValue);
   };
 
+  const getValueState = (value: number) => {
+    if (value === 0) return "null";
+    if (value < 0) return "negative";
+    return "success";
+  };
+
+  const getRowStyles = () => {
+    const budgetState = getValueState(budgetValue);
+    const actualState = getValueState(actualValue);
+    
+    return {
+      row: cn(
+        "grid grid-cols-12 gap-4 mb-2 items-center p-2 rounded-lg transition-colors",
+        {
+          "hover:bg-gray-50": true,
+          "bg-gray-50": label === "BALANCE",
+        }
+      ),
+      budget: cn("relative", {
+        "bg-gray-100": budgetState === "null",
+        "bg-blue-50": budgetState !== "null" && budgetState !== "success",
+        "bg-green-50": budgetState === "success",
+      }),
+      actual: cn("relative", {
+        "bg-gray-100": actualState === "null",
+        "bg-blue-50": actualState !== "null" && actualState !== "success",
+        "bg-green-50": actualState === "success",
+      })
+    };
+  };
+
+  const styles = getRowStyles();
+
   return (
-    <div className="grid grid-cols-12 gap-4 mb-2 items-center">
+    <div className={styles.row}>
       <div className="col-span-4 flex items-center gap-2">
         {isCheckbox && (
           <input
@@ -56,9 +90,9 @@ const BudgetRow = ({
             className="w-4 h-4"
           />
         )}
-        <Label>{label}</Label>
+        <Label className={label === "BALANCE" ? "font-semibold" : ""}>{label}</Label>
       </div>
-      <div className="col-span-4 relative">
+      <div className={cn("col-span-4", styles.budget)}>
         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
           $
         </span>
@@ -66,10 +100,12 @@ const BudgetRow = ({
           type="text"
           value={budgetValue.toFixed(2)}
           onChange={(e) => handleValueChange(e.target.value, onBudgetChange)}
-          className="text-right pl-6"
+          className={cn("text-right pl-6", {
+            "font-semibold": label === "BALANCE",
+          })}
         />
       </div>
-      <div className="col-span-4 relative">
+      <div className={cn("col-span-4", styles.actual)}>
         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
           $
         </span>
@@ -77,7 +113,9 @@ const BudgetRow = ({
           type="text"
           value={actualValue.toFixed(2)}
           onChange={(e) => handleValueChange(e.target.value, onActualChange)}
-          className="text-right pl-6"
+          className={cn("text-right pl-6", {
+            "font-semibold": label === "BALANCE",
+          })}
         />
       </div>
     </div>
