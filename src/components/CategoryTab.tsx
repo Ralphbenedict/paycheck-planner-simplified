@@ -47,12 +47,13 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
     <div className="space-y-4">
       <div className="grid grid-cols-12 gap-4 mb-4">
         <div className="col-span-4"></div>
-        <div className="col-span-4 text-center font-semibold">
-          <h3 className="text-right pr-6">BUDGET</h3>
+        <div className="col-span-3 text-right font-semibold">
+          <h3>BUDGET</h3>
         </div>
-        <div className="col-span-4 text-center font-semibold">
-          <h3 className="text-right pr-6">ACTUAL</h3>
+        <div className="col-span-3 text-right font-semibold">
+          <h3>ACTUAL</h3>
         </div>
+        <div className="col-span-2"></div>
       </div>
 
       {items.map((item, index) => (
