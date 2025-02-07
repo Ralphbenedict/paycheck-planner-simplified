@@ -2,6 +2,7 @@
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { DollarSign } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface BudgetGraphsProps {
   totalIncome: number;
@@ -15,7 +16,7 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
   const budgetPercentage = totalIncome > 0 ? (leftToBudget / totalIncome) * 100 : 0;
   const spendPercentage = totalBudgeted > 0 ? (leftToSpend / totalBudgeted) * 100 : 0;
 
-  const renderGraph = (title: string, amount: number, percentage: number, color: string) => {
+  const renderGraph = (title: string, amount: number, percentage: number, color: string, remainingColor: string) => {
     const data = [
       { value: percentage },
       { value: 100 - percentage },
@@ -36,7 +37,7 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
                 dataKey="value"
               >
                 <Cell fill={color} />
-                <Cell fill={title === "LEFT TO BUDGET" ? "#F2FCE2" : "#F1F0FB"} />
+                <Cell fill={remainingColor} />
               </Pie>
             </PieChart>
           </ResponsiveContainer>
@@ -55,9 +56,12 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8">
-      {renderGraph("LEFT TO BUDGET", leftToBudget, budgetPercentage, "#1EAEDB")}
-      {renderGraph("LEFT TO SPEND", leftToSpend, spendPercentage, "#F97316")}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8 relative">
+      {renderGraph("LEFT TO BUDGET", leftToBudget, budgetPercentage, "#1EAEDB", "#FDE1D3")}
+      <div className="hidden md:block absolute left-1/2 top-8 bottom-8 -translate-x-1/2">
+        <Separator orientation="vertical" />
+      </div>
+      {renderGraph("LEFT TO SPEND", leftToSpend, spendPercentage, "#F97316", "#D3E4FD")}
     </div>
   );
 };
