@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import BudgetRow from "./BudgetRow";
 import { Button } from "./ui/button";
@@ -46,8 +47,12 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
     <div className="space-y-4">
       <div className="grid grid-cols-12 gap-4 mb-4">
         <div className="col-span-4"></div>
-        <h3 className="col-span-4 text-right font-semibold">BUDGET</h3>
-        <h3 className="col-span-4 text-right font-semibold">ACTUAL</h3>
+        <div className="col-span-4 text-center font-semibold">
+          <h3 className="text-right pr-6">BUDGET</h3>
+        </div>
+        <div className="col-span-4 text-center font-semibold">
+          <h3 className="text-right pr-6">ACTUAL</h3>
+        </div>
       </div>
 
       {items.map((item, index) => (
