@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import BudgetRow from "./BudgetRow";
 import { Button } from "./ui/button";
@@ -47,16 +46,11 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
     <div className="space-y-4">
       <div className="grid grid-cols-12 gap-4 mb-4">
         <div className="col-span-4"></div>
-        <div className="col-span-3 text-right font-semibold">
-          <h3>BUDGET</h3>
-        </div>
-        <div className="col-span-3 text-right font-semibold">
-          <h3>ACTUAL</h3>
-        </div>
-        <div className="col-span-2"></div>
+        <h3 className="col-span-4 text-right font-semibold">BUDGET</h3>
+        <h3 className="col-span-4 text-right font-semibold">ACTUAL</h3>
       </div>
 
-      {items.map((item, index) => (
+      {items.map((item) => (
         <div key={item.id} className="flex items-center gap-2">
           <BudgetRow
             label={item.label}
@@ -64,7 +58,6 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
             actualValue={item.actual}
             onBudgetChange={(value) => updateItem(item.id, { budget: value })}
             onActualChange={(value) => updateItem(item.id, { actual: value })}
-            index={index}
           />
           <Button
             variant="ghost"
@@ -87,34 +80,13 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
       </Button>
 
       <div className="border-t pt-4 mt-4">
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-4">
-            <h3 className="font-semibold">BALANCE</h3>
-          </div>
-          <div className="col-span-3">
-            <div className="bg-gray-50 rounded-md">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-              <input
-                type="text"
-                value={totalBudget.toFixed(2)}
-                readOnly
-                className="w-full px-6 py-2 text-right bg-transparent font-semibold"
-              />
-            </div>
-          </div>
-          <div className="col-span-3">
-            <div className="bg-gray-50 rounded-md">
-              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
-              <input
-                type="text"
-                value={totalActual.toFixed(2)}
-                readOnly
-                className="w-full px-6 py-2 text-right bg-transparent font-semibold"
-              />
-            </div>
-          </div>
-          <div className="col-span-2"></div>
-        </div>
+        <BudgetRow
+          label="BALANCE"
+          budgetValue={totalBudget}
+          actualValue={totalActual}
+          onBudgetChange={() => {}}
+          onActualChange={() => {}}
+        />
       </div>
     </div>
   );

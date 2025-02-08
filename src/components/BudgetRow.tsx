@@ -1,8 +1,6 @@
-
 import React from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { cn } from "@/lib/utils";
 
 interface BudgetRowProps {
   label: string;
@@ -13,7 +11,6 @@ interface BudgetRowProps {
   isCheckbox?: boolean;
   checked?: boolean;
   onCheckChange?: (checked: boolean) => void;
-  index?: number;
 }
 
 const BudgetRow = ({
@@ -25,70 +22,16 @@ const BudgetRow = ({
   isCheckbox = false,
   checked,
   onCheckChange,
-  index = 0,
 }: BudgetRowProps) => {
-  const formatValue = (value: number) => {
-    return value === 0 ? "" : value.toFixed(2);
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(value);
   };
-
-  const handleValueChange = (value: string, onChange: (value: number) => void) => {
-    // If empty string, set to 0
-    if (!value) {
-      onChange(0);
-      return;
-    }
-
-    // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    
-    // Ensure only one decimal point
-    const parts = numericValue.split('.');
-    const sanitizedValue = parts[0] + (parts.length > 1 ? '.' + parts[1] : '');
-    
-    // Convert to number and update
-    const numberValue = parseFloat(sanitizedValue) || 0;
-    onChange(numberValue);
-  };
-
-  const getValueState = (value: number) => {
-    if (value === 0) return "null";
-    if (value < 0) return "negative";
-    return "success";
-  };
-
-  const getRowStyles = () => {
-    const budgetState = getValueState(budgetValue);
-    const actualState = getValueState(actualValue);
-    
-    const isEven = index % 2 === 0;
-    
-    return {
-      row: cn(
-        "grid grid-cols-12 gap-4 mb-2 items-center p-2 rounded-lg transition-colors",
-        {
-          "hover:bg-gray-50": true,
-          "bg-gray-50": label === "BALANCE",
-          "bg-gradient-to-r from-[#fdfcfb] to-[#e2d1c3]/20": isEven && label !== "BALANCE",
-          "bg-gradient-to-r from-[#e6e9f0] to-[#eef1f5]/20": !isEven && label !== "BALANCE",
-        }
-      ),
-      budget: cn("relative", {
-        "bg-gray-100": budgetState === "null",
-        "bg-blue-50": budgetState !== "null" && budgetState !== "success",
-        "bg-green-50": budgetState === "success",
-      }),
-      actual: cn("relative", {
-        "bg-gray-100": actualState === "null",
-        "bg-blue-50": actualState !== "null" && actualState !== "success",
-        "bg-green-50": actualState === "success",
-      })
-    };
-  };
-
-  const styles = getRowStyles();
 
   return (
-    <div className={styles.row}>
+    <div className="grid grid-cols-12 gap-4 mb-2 items-center">
       <div className="col-span-4 flex items-center gap-2">
         {isCheckbox && (
           <input
@@ -98,32 +41,24 @@ const BudgetRow = ({
             className="w-4 h-4"
           />
         )}
-        <Label className={label === "BALANCE" ? "font-semibold" : ""}>{label}</Label>
+        <Label>{label}</Label>
       </div>
-      <div className={cn("col-span-4", styles.budget)}>
-        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-          $
-        </span>
+      <div className="col-span-4">
         <Input
-          type="text"
-          value={formatValue(budgetValue)}
-          onChange={(e) => handleValueChange(e.target.value, onBudgetChange)}
-          className={cn("text-right pl-6", {
-            "font-semibold": label === "BALANCE",
-          })}
+          type="number"
+          value={budgetValue}
+          onChange={(e) => onBudgetChange(parseFloat(e.target.value) || 0)}
+          className="text-right"
+          step="0.01"
         />
       </div>
-      <div className={cn("col-span-4", styles.actual)}>
-        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-          $
-        </span>
+      <div className="col-span-4">
         <Input
-          type="text"
-          value={formatValue(actualValue)}
-          onChange={(e) => handleValueChange(e.target.value, onActualChange)}
-          className={cn("text-right pl-6", {
-            "font-semibold": label === "BALANCE",
-          })}
+          type="number"
+          value={actualValue}
+          onChange={(e) => onActualChange(parseFloat(e.target.value) || 0)}
+          className="text-right"
+          step="0.01"
         />
       </div>
     </div>
