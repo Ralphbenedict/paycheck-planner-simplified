@@ -4,7 +4,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Check } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -24,47 +24,22 @@ const DateRangePicker = ({
   const { toast } = useToast();
   const [startOpen, setStartOpen] = React.useState(false);
   const [endOpen, setEndOpen] = React.useState(false);
-  const [tempStartDate, setTempStartDate] = React.useState<Date | undefined>(startDate);
-  const [tempEndDate, setTempEndDate] = React.useState<Date | undefined>(endDate);
 
-  React.useEffect(() => {
-    setTempStartDate(startDate);
-  }, [startDate]);
-
-  React.useEffect(() => {
-    setTempEndDate(endDate);
-  }, [endDate]);
-
-  const handleStartConfirm = () => {
-    if (tempStartDate) {
-      onStartDateChange(tempStartDate);
-      setStartOpen(false);
-    }
-  };
-
-  const handleEndConfirm = () => {
-    if (tempEndDate && tempStartDate && tempEndDate < tempStartDate) {
+  const handleStartSelect = (date: Date | undefined) => {
+    if (date && endDate && date > endDate) {
       toast({
         title: "Invalid Date Selection",
-        description: "End date cannot be before start date",
+        description: "Start date cannot be after end date",
         variant: "destructive",
       });
       return;
     }
-    if (tempEndDate) {
-      onEndDateChange(tempEndDate);
-      setEndOpen(false);
-    }
-  };
-
-  const handleStartSelect = (date: Date | undefined) => {
-    setTempStartDate(date);
     onStartDateChange(date);
     setStartOpen(false);
   };
 
   const handleEndSelect = (date: Date | undefined) => {
-    if (date && tempStartDate && date < tempStartDate) {
+    if (date && startDate && date < startDate) {
       toast({
         title: "Invalid Date Selection",
         description: "End date cannot be before start date",
@@ -72,7 +47,6 @@ const DateRangePicker = ({
       });
       return;
     }
-    setTempEndDate(date);
     onEndDateChange(date);
     setEndOpen(false);
   };
@@ -95,14 +69,12 @@ const DateRangePicker = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div>
-              <Calendar
-                mode="single"
-                selected={tempStartDate}
-                onSelect={handleStartSelect}
-                initialFocus
-              />
-            </div>
+            <Calendar
+              mode="single"
+              selected={startDate}
+              onSelect={handleStartSelect}
+              initialFocus
+            />
           </PopoverContent>
         </Popover>
       </div>
@@ -123,14 +95,12 @@ const DateRangePicker = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <div>
-              <Calendar
-                mode="single"
-                selected={tempEndDate}
-                onSelect={handleEndSelect}
-                initialFocus
-              />
-            </div>
+            <Calendar
+              mode="single"
+              selected={endDate}
+              onSelect={handleEndSelect}
+              initialFocus
+            />
           </PopoverContent>
         </Popover>
       </div>
