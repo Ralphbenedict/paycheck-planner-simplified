@@ -97,8 +97,8 @@ const CreateBudgetModal = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
+      <DialogContent onPointerDownOutside={(e) => e.preventDefault()} className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{initialData ? "Edit Budget" : "Create New Budget"}</DialogTitle>
         </DialogHeader>
