@@ -5,13 +5,14 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Plus, Trash2 } from "lucide-react";
 
+interface SummaryItem {
+  key: string;
+  budget: number;
+  actual: number;
+}
+
 interface SummaryData {
-  rollover: { budget: number; actual: number };
-  income: { budget: number; actual: number };
-  savings: { budget: number; actual: number };
-  bills: { budget: number; actual: number };
-  expenses: { budget: number; actual: number };
-  debt: { budget: number; actual: number };
+  [key: string]: { budget: number; actual: number };
 }
 
 interface BudgetSummaryProps {
@@ -94,7 +95,7 @@ const BudgetSummary = ({
               size="icon"
               onClick={() => {
                 const { [key]: removed, ...rest } = summaryData;
-                setSummaryData(rest as SummaryData);
+                setSummaryData(rest);
               }}
               className="h-8 w-8"
             >
