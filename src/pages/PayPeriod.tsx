@@ -50,12 +50,14 @@ const PayPeriod = () => {
   const [periodData, setPeriodData] = useState<PeriodData>(() => {
     const savedData = localStorage.getItem(`period_${id}`);
     if (savedData) {
-      const parsed = JSON.parse(savedData, (key, value) => {
-        if (key === "startDate" || key === "endDate") {
-          return value ? new Date(value) : undefined;
-        }
-        return value;
-      });
+      const parsed = JSON.parse(savedData);
+      // Convert date strings back to Date objects
+      if (parsed.startDate) {
+        parsed.startDate = new Date(parsed.startDate);
+      }
+      if (parsed.endDate) {
+        parsed.endDate = new Date(parsed.endDate);
+      }
       setEditedName(parsed.name || "");
       setEditedDescription(parsed.description || "");
       return parsed;
@@ -224,3 +226,4 @@ const PayPeriod = () => {
 };
 
 export default PayPeriod;
+
