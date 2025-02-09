@@ -50,6 +50,14 @@ const DateRangePicker = ({
     setEndOpen(false);
   };
 
+  const handleStartSelect = (date: Date | undefined) => {
+    setTempStartDate(date);
+  };
+
+  const handleEndSelect = (date: Date | undefined) => {
+    setTempEndDate(date);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
@@ -71,7 +79,7 @@ const DateRangePicker = ({
             <Calendar
               mode="single"
               selected={tempStartDate}
-              onSelect={setTempStartDate}
+              onSelect={handleStartSelect}
               initialFocus
             />
             <div className="p-3 border-t border-border">
@@ -107,7 +115,7 @@ const DateRangePicker = ({
             <Calendar
               mode="single"
               selected={tempEndDate}
-              onSelect={setTempEndDate}
+              onSelect={handleEndSelect}
               initialFocus
             />
             <div className="p-3 border-t border-border">
@@ -128,3 +136,4 @@ const DateRangePicker = ({
 };
 
 export default DateRangePicker;
+
