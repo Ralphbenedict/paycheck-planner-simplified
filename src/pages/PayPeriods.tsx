@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, UserPlus, LogIn } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import SignUpForm from "@/components/SignUpForm";
 
 interface PayPeriod {
   id: string;
@@ -15,14 +16,17 @@ interface PayPeriod {
 
 const PayPeriods = () => {
   const navigate = useNavigate();
+  const [showSignUp, setShowSignUp] = React.useState(false);
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
-    return savedPeriods ? JSON.parse(savedPeriods, (key, value) => {
-      if (key === "startDate" || key === "endDate" || key === "createdAt") {
-        return value ? new Date(value) : undefined;
-      }
-      return value;
-    }) : [];
+    return savedPeriods
+      ? JSON.parse(savedPeriods, (key, value) => {
+          if (key === "startDate" || key === "endDate" || key === "createdAt") {
+            return value ? new Date(value) : undefined;
+          }
+          return value;
+        })
+      : [];
   });
 
   const createNewPeriod = () => {
@@ -32,7 +36,7 @@ const PayPeriods = () => {
       endDate: undefined,
       createdAt: new Date(),
     };
-    
+
     const updatedPeriods = [...periods, newPeriod];
     setPeriods(updatedPeriods);
     localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
@@ -44,7 +48,7 @@ const PayPeriods = () => {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">My Budgets</h1>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setShowSignUp(true)}>
             <UserPlus className="h-4 w-4 mr-2" />
             Sign Up
           </Button>
@@ -93,6 +97,8 @@ const PayPeriods = () => {
           ))
         )}
       </div>
+
+      <SignUpForm open={showSignUp} onOpenChange={setShowSignUp} />
     </div>
   );
 };
