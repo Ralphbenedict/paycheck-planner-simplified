@@ -1,69 +1,125 @@
+
 # Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/a87bcb47-a23c-4c2e-93f2-970fd3984d25
 
-## How can I edit this code?
+## Local Development Setup
 
-There are several ways of editing your application.
+### Prerequisites
+1. Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. [Supabase CLI](https://supabase.com/docs/guides/cli) - for local development with Supabase
+3. [Docker](https://docs.docker.com/get-docker/) - required for local Supabase development
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/a87bcb47-a23c-4c2e-93f2-970fd3984d25) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Step 1: Clone and Run the Frontend
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository using the project's Git URL
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to the project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Install the necessary dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server with auto-reloading and instant preview
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Step 2: Set Up Local Supabase Instance
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. Install Supabase CLI:
+```bash
+# macOS
+brew install supabase/tap/supabase
 
-**Use GitHub Codespaces**
+# Windows (requires scoop.sh)
+scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
+scoop install supabase
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Start local Supabase:
+```bash
+# Initialize Supabase
+supabase init
 
-## What technologies are used for this project?
+# Start the local Supabase instance
+supabase start
 
-This project is built with .
+# This will output your local connection details
+```
 
+3. Copy the connection details provided by `supabase start` and create a `.env.local` file in your project root:
+```
+VITE_SUPABASE_URL=your_local_supabase_url
+VITE_SUPABASE_ANON_KEY=your_local_anon_key
+```
+
+### Backend Features Available Locally
+
+#### Authentication
+- Local auth is ready to use with the started Supabase instance
+- Default test user: test@example.com / password123
+- Manage users via Supabase Studio at http://localhost:54323
+
+#### Database
+- Access Studio at http://localhost:54323
+- Create tables and manage data through the UI
+- Run migrations:
+```bash
+supabase db reset    # Reset to clean state
+supabase db pull     # Generate migration files
+supabase db push     # Apply migrations
+```
+
+#### File Storage
+- Available through Supabase Storage
+- Manage via Studio or API
+- Local files stored in `supabase/storage`
+
+#### APIs & Edge Functions
+- Create Edge Functions:
+```bash
+supabase functions new my-function
+supabase functions serve   # Run locally
+```
+
+## Project Structure
+```
+├── src/
+│   ├── components/    # React components
+│   ├── pages/         # Route components
+│   ├── hooks/         # Custom React hooks
+│   └── lib/           # Utility functions
+├── supabase/          # Supabase configuration
+└── ...
+```
+
+## What technologies are used?
+
+This project is built with:
 - Vite
 - TypeScript
 - React
 - shadcn-ui
 - Tailwind CSS
+- Supabase (for backend functionality)
 
-## How can I deploy this project?
+## Deployment Options
 
-Simply open [Lovable](https://lovable.dev/projects/a87bcb47-a23c-4c2e-93f2-970fd3984d25) and click on Share -> Publish.
+1. **Using Lovable**
+   - Open [Lovable](https://lovable.dev/projects/a87bcb47-a23c-4c2e-93f2-970fd3984d25)
+   - Click on Share -> Publish
 
-## I want to use a custom domain - is that possible?
+2. **Custom Deployment**
+   - Deploy frontend to any static hosting (Netlify, Vercel, etc.)
+   - Deploy Supabase to either:
+     - Supabase Cloud (recommended for production)
+     - Self-hosted using Docker
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+## Custom Domain Setup
+
+We don't support custom domains directly through Lovable (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+
