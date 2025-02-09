@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import DateRangePicker from "@/components/DateRangePicker";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -32,8 +31,6 @@ const formSchema = z.object({
   description: z
     .string()
     .max(250, "Description must be less than 250 characters"),
-  startDate: z.date().optional(),
-  endDate: z.date().optional(),
 });
 
 interface CreateBudgetModalProps {
@@ -43,8 +40,6 @@ interface CreateBudgetModalProps {
   initialData?: {
     name: string;
     description: string;
-    startDate?: Date;
-    endDate?: Date;
   } | null;
 }
 
@@ -60,8 +55,6 @@ const CreateBudgetModal = ({
     defaultValues: {
       name: initialData?.name || "",
       description: initialData?.description || "",
-      startDate: initialData?.startDate,
-      endDate: initialData?.endDate,
     },
   });
 
@@ -70,28 +63,16 @@ const CreateBudgetModal = ({
       form.reset({
         name: initialData.name,
         description: initialData.description,
-        startDate: initialData.startDate,
-        endDate: initialData.endDate,
       });
     } else if (!open) {
       form.reset({
         name: "",
         description: "",
-        startDate: undefined,
-        endDate: undefined,
       });
     }
   }, [open, initialData, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    if (values.startDate && values.endDate && values.endDate < values.startDate) {
-      toast({
-        title: "Invalid Date Range",
-        description: "End date cannot be before start date",
-        variant: "destructive",
-      });
-      return;
-    }
     onSubmit(values);
     form.reset();
   };
@@ -134,19 +115,6 @@ const CreateBudgetModal = ({
                 </FormItem>
               )}
             />
-            <div className="space-y-2">
-              <FormLabel>Date Range</FormLabel>
-              <DateRangePicker
-                startDate={form.watch("startDate")}
-                endDate={form.watch("endDate")}
-                onStartDateChange={(date) =>
-                  form.setValue("startDate", date, { shouldValidate: true })
-                }
-                onEndDateChange={(date) =>
-                  form.setValue("endDate", date, { shouldValidate: true })
-                }
-              />
-            </div>
             <div className="flex justify-end space-x-2 pt-4">
               <Button
                 type="button"
