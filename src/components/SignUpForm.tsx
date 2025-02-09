@@ -41,6 +41,36 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
     return "";
   };
 
+  const generateStrongPassword = () => {
+    const length = 16;
+    const charset = {
+      uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      lowercase: 'abcdefghijklmnopqrstuvwxyz',
+      numbers: '0123456789',
+      symbols: '!@#$%^&*'
+    };
+
+    let password = '';
+    
+    // Ensure at least one character from each set
+    password += charset.uppercase.charAt(Math.floor(Math.random() * charset.uppercase.length));
+    password += charset.lowercase.charAt(Math.floor(Math.random() * charset.lowercase.length));
+    password += charset.numbers.charAt(Math.floor(Math.random() * charset.numbers.length));
+    password += charset.symbols.charAt(Math.floor(Math.random() * charset.symbols.length));
+
+    // Fill the rest with random characters
+    const allChars = Object.values(charset).join('');
+    for (let i = password.length; i < length; i++) {
+      password += allChars.charAt(Math.floor(Math.random() * allChars.length));
+    }
+
+    // Shuffle the password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    setFormData(prev => ({ ...prev, password }));
+    setPasswordError('');
+  };
+
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPassword = e.target.value;
     setFormData({ ...formData, password: newPassword });
@@ -90,7 +120,18 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <div className="flex justify-between items-center">
+              <Label htmlFor="password">Password</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+                onClick={generateStrongPassword}
+              >
+                Suggest Strong Password
+              </Button>
+            </div>
             <Input
               id="password"
               type="password"
