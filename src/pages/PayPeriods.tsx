@@ -2,12 +2,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, UserPlus, LogIn, LogOut, Pencil } from "lucide-react";
+import { Plus, UserPlus, LogIn, LogOut, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import SignUpForm from "@/components/SignUpForm";
 import LoginForm from "@/components/LoginForm";
 import CreateBudgetModal from "@/components/CreateBudgetModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface PayPeriod {
   id: string;
@@ -20,9 +31,12 @@ interface PayPeriod {
 
 const PayPeriods = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [showSignUp, setShowSignUp] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
   const [showCreateModal, setShowCreateModal] = React.useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [periodToDelete, setPeriodToDelete] = React.useState<string | null>(null);
   const [user, setUser] = React.useState<{ fullName: string } | null>(null);
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
@@ -70,6 +84,27 @@ const PayPeriods = () => {
     setUser(null);
   };
 
+  const handleDeleteClick = (periodId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPeriodToDelete(periodId);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (periodToDelete) {
+      const updatedPeriods = periods.filter((p) => p.id !== periodToDelete);
+      setPeriods(updatedPeriods);
+      localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
+      setShowDeleteDialog(false);
+      setPeriodToDelete(null);
+      toast({
+        title: "Budget deleted",
+        description: "The budget has been successfully deleted.",
+      });
+    }
+  };
+
   return (
     <div className="container py-8 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
@@ -109,9 +144,10 @@ const PayPeriods = () => {
           </div>
         ) : (
           periods.map((period) => (
-            <div
+            <Link
               key={period.id}
-              className="p-4 rounded-lg border hover:border-primary transition-colors"
+              to={`/period/${period.id}`}
+              className="block p-4 rounded-lg border hover:border-primary transition-colors relative group"
             >
               <div className="flex justify-between items-center">
                 <div className="flex-1">
@@ -137,13 +173,21 @@ const PayPeriods = () => {
                     Created {format(period.createdAt, "PPP")}
                   </p>
                 </div>
-                <Link to={`/period/${period.id}`}>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-destructive hover:text-destructive/90"
+                    onClick={(e) => handleDeleteClick(period.id, e)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                   <Button variant="ghost" size="sm">
                     View Details →
                   </Button>
-                </Link>
+                </div>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>
@@ -159,6 +203,27 @@ const PayPeriods = () => {
         onOpenChange={setShowCreateModal}
         onSubmit={createNewPeriod}
       />
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Budget</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this budget? This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
