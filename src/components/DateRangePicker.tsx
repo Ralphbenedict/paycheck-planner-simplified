@@ -41,27 +41,11 @@ const DateRangePicker = ({
   }, [endDate]);
 
   const handleStartSelect = (date: Date | undefined) => {
-    if (date && endDate && date > endDate) {
-      toast({
-        title: "Invalid Date Selection",
-        description: "Start date cannot be after end date",
-        variant: "destructive",
-      });
-      return;
-    }
     onStartDateChange(date);
     setStartOpen(false);
   };
 
   const handleEndSelect = (date: Date | undefined) => {
-    if (date && startDate && date < startDate) {
-      toast({
-        title: "Invalid Date Selection",
-        description: "End date cannot be before start date",
-        variant: "destructive",
-      });
-      return;
-    }
     onEndDateChange(date);
     setEndOpen(false);
   };
@@ -73,14 +57,6 @@ const DateRangePicker = ({
     if (value.length === 10) {
       const parsedDate = parse(value, "MM/dd/yyyy", new Date());
       if (isValid(parsedDate)) {
-        if (endDate && parsedDate > endDate) {
-          toast({
-            title: "Invalid Date Selection",
-            description: "Start date cannot be after end date",
-            variant: "destructive",
-          });
-          return;
-        }
         onStartDateChange(parsedDate);
       } else {
         toast({
@@ -99,14 +75,6 @@ const DateRangePicker = ({
     if (value.length === 10) {
       const parsedDate = parse(value, "MM/dd/yyyy", new Date());
       if (isValid(parsedDate)) {
-        if (startDate && parsedDate < startDate) {
-          toast({
-            title: "Invalid Date Selection",
-            description: "End date cannot be before start date",
-            variant: "destructive",
-          });
-          return;
-        }
         onEndDateChange(parsedDate);
       } else {
         toast({
