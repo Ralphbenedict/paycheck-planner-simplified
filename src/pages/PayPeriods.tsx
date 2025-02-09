@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,6 +27,33 @@ interface PayPeriod {
   endDate: Date | undefined;
   createdAt: Date;
 }
+
+interface CategoryItem {
+  id: string;
+  label: string;
+  budget: number;
+  actual: number;
+}
+
+interface CategoryItems {
+  [key: string]: CategoryItem[];
+}
+
+interface SummaryData {
+  [key: string]: { budget: number; actual: number };
+}
+
+const DEFAULT_SUMMARY_DATA: SummaryData = {
+  rollover: { budget: 0, actual: 0 },
+  income: { budget: 0, actual: 0 },
+  savings: { budget: 0, actual: 0 },
+  investments: { budget: 0, actual: 0 },
+  bills: { budget: 0, actual: 0 },
+  expenses: { budget: 0, actual: 0 },
+  debt: { budget: 0, actual: 0 }
+};
+
+const DEFAULT_CATEGORIES = ['income', 'savings', 'investments', 'bills', 'expenses', 'debt'];
 
 const PayPeriods = () => {
   const navigate = useNavigate();
@@ -88,7 +114,22 @@ const PayPeriods = () => {
 
       const updatedPeriods = [...periods, newPeriod];
       setPeriods(updatedPeriods);
+      
+      // Save both the periods list and the individual period data
       localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
+      localStorage.setItem(`period_${newPeriod.id}`, JSON.stringify({
+        name: data.name,
+        description: data.description,
+        startDate: undefined,
+        endDate: undefined,
+        summaryData: DEFAULT_SUMMARY_DATA,
+        categoryItems: DEFAULT_CATEGORIES.reduce((acc, category) => {
+          acc[category] = [];
+          return acc;
+        }, {} as CategoryItems),
+        rollover: false,
+      }));
+      
       navigate(`/period/${newPeriod.id}`);
     }
     setShowCreateModal(false);
