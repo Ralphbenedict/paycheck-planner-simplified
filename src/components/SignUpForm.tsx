@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { LogIn } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface SignUpFormProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface SignUpFormProps {
 }
 
 const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
+  const { toast } = useToast();
   const [formData, setFormData] = React.useState({
     fullName: "",
     email: "",
@@ -86,6 +88,17 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
     }
     // TODO: Implement signup logic after Supabase integration
     console.log("Form submitted:", formData);
+    toast({
+      title: "Account created",
+      description: "Your account has been created successfully. You can now log in.",
+    });
+    onOpenChange(false); // Close the dialog after successful signup
+    setFormData({
+      fullName: "",
+      email: "",
+      password: "",
+      acceptTerms: false,
+    });
   };
 
   return (
@@ -93,6 +106,9 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Sign Up</DialogTitle>
+          <DialogDescription>
+            Create an account to start managing your budgets.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
