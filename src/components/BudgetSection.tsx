@@ -10,6 +10,7 @@ interface BudgetSectionProps {
   children: React.ReactNode;
   onEdit?: () => void;
   editable?: boolean;
+  hideTitle?: boolean;
 }
 
 const BudgetSection = ({ 
@@ -17,7 +18,8 @@ const BudgetSection = ({
   className, 
   children,
   onEdit,
-  editable = false
+  editable = false,
+  hideTitle = false
 }: BudgetSectionProps) => {
   return (
     <div className={cn(
@@ -29,18 +31,20 @@ const BudgetSection = ({
       },
       className
     )}>
-      <div className="flex items-center gap-2 mb-4">
-        <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-        {editable && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onEdit}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
+      {!hideTitle && (
+        <div className="flex items-center gap-2 mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+          {editable && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onEdit}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      )}
       {children}
     </div>
   );

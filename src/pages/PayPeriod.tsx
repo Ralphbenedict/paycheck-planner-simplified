@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BudgetSection from "@/components/BudgetSection";
@@ -183,7 +182,7 @@ const PayPeriod = () => {
         )}
       </div>
 
-      <BudgetSection title="PAYCHECK PERIOD">
+      <BudgetSection title="PAYCHECK PERIOD" hideTitle>
         <DateRangePicker
           startDate={periodData.startDate}
           endDate={periodData.endDate}
@@ -226,4 +225,3 @@ const PayPeriod = () => {
 };
 
 export default PayPeriod;
-
