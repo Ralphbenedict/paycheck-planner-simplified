@@ -21,13 +21,18 @@ interface CategoriesProps {
 }
 
 const Categories = ({ 
-  categoryItems, 
+  categoryItems = {}, // Provide default empty object
   setCategoryItems,
-  availableCategories = Object.keys(categoryItems).map(key => ({
-    key,
-    label: key.charAt(0).toUpperCase() + key.slice(1)
-  }))
+  availableCategories = [] // Provide default empty array
 }: CategoriesProps) => {
+  // Ensure we have valid categories, defaulting to an empty array if needed
+  const categories = availableCategories.length > 0 
+    ? availableCategories 
+    : Object.keys(categoryItems || {}).map(key => ({
+        key,
+        label: key.charAt(0).toUpperCase() + key.slice(1)
+      }));
+
   const handleItemsChange = (category: string, newItems: CategoryItem[]) => {
     setCategoryItems(prev => ({
       ...prev,
@@ -35,19 +40,24 @@ const Categories = ({
     }));
   };
 
+  // Only render if we have categories
+  if (categories.length === 0) {
+    return null;
+  }
+
   return (
-    <Tabs defaultValue={availableCategories[0]?.key} className="w-full">
+    <Tabs defaultValue={categories[0]?.key} className="w-full">
       <TabsList className="grid w-full" style={{ 
-        gridTemplateColumns: `repeat(${availableCategories.length}, minmax(0, 1fr))` 
+        gridTemplateColumns: `repeat(${categories.length}, minmax(0, 1fr))` 
       }}>
-        {availableCategories.map(({ key, label }) => (
+        {categories.map(({ key, label }) => (
           <TabsTrigger key={key} value={key}>
             {label}
           </TabsTrigger>
         ))}
       </TabsList>
 
-      {availableCategories.map(({ key, label }) => (
+      {categories.map(({ key, label }) => (
         <TabsContent key={key} value={key}>
           <CategoryTab
             title={label}
