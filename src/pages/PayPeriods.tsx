@@ -6,6 +6,7 @@ import { Plus, UserPlus, LogIn } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import SignUpForm from "@/components/SignUpForm";
+import LoginForm from "@/components/LoginForm";
 
 interface PayPeriod {
   id: string;
@@ -17,6 +18,7 @@ interface PayPeriod {
 const PayPeriods = () => {
   const navigate = useNavigate();
   const [showSignUp, setShowSignUp] = React.useState(false);
+  const [showLogin, setShowLogin] = React.useState(false);
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
     return savedPeriods
@@ -52,7 +54,7 @@ const PayPeriods = () => {
             <UserPlus className="h-4 w-4 mr-2" />
             Sign Up
           </Button>
-          <Button variant="outline">
+          <Button variant="outline" onClick={() => setShowLogin(true)}>
             <LogIn className="h-4 w-4 mr-2" />
             Login
           </Button>
@@ -99,6 +101,7 @@ const PayPeriods = () => {
       </div>
 
       <SignUpForm open={showSignUp} onOpenChange={setShowSignUp} />
+      <LoginForm open={showLogin} onOpenChange={setShowLogin} />
     </div>
   );
 };
