@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
+// Define the structure for a pay period
 interface PayPeriod {
   id: string;
   name: string;
@@ -28,6 +30,7 @@ interface PayPeriod {
   createdAt: Date;
 }
 
+// Define the structure for budget category items
 interface CategoryItem {
   id: string;
   label: string;
@@ -35,14 +38,17 @@ interface CategoryItem {
   actual: number;
 }
 
+// Map of category names to their respective items
 interface CategoryItems {
   [key: string]: CategoryItem[];
 }
 
+// Structure for summary data of budget categories
 interface SummaryData {
   [key: string]: { budget: number; actual: number };
 }
 
+// Default summary data with zero values for all categories
 const DEFAULT_SUMMARY_DATA: SummaryData = {
   rollover: { budget: 0, actual: 0 },
   income: { budget: 0, actual: 0 },
@@ -53,18 +59,25 @@ const DEFAULT_SUMMARY_DATA: SummaryData = {
   debt: { budget: 0, actual: 0 }
 };
 
+// List of default budget categories
 const DEFAULT_CATEGORIES = ['income', 'savings', 'investments', 'bills', 'expenses', 'debt'];
 
 const PayPeriods = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  // State management for modal visibility
   const [showSignUp, setShowSignUp] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
   const [showCreateModal, setShowCreateModal] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  
+  // State for managing period operations
   const [periodToDelete, setPeriodToDelete] = React.useState<string | null>(null);
   const [periodToEdit, setPeriodToEdit] = React.useState<PayPeriod | null>(null);
   const [user, setUser] = React.useState<{ fullName: string } | null>(null);
+  
+  // Initialize periods from localStorage with proper date parsing
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
     return savedPeriods
@@ -81,6 +94,7 @@ const PayPeriods = () => {
       : [];
   });
 
+  // Handler for creating or updating a budget period
   const createNewPeriod = (data: {
     name: string;
     description: string;
@@ -88,7 +102,7 @@ const PayPeriods = () => {
     endDate: Date | undefined;
   }) => {
     if (periodToEdit) {
-      // Update existing period
+      // Update existing period logic
       const updatedPeriods = periods.map((p) =>
         p.id === periodToEdit.id
           ? { ...p, ...data }
@@ -102,7 +116,7 @@ const PayPeriods = () => {
         description: "The budget has been successfully updated.",
       });
     } else {
-      // Create new period
+      // Create new period logic
       const newPeriod: PayPeriod = {
         id: Math.random().toString(36).substr(2, 9),
         name: data.name,
@@ -115,7 +129,7 @@ const PayPeriods = () => {
       const updatedPeriods = [...periods, newPeriod];
       setPeriods(updatedPeriods);
       
-      // Save both the periods list and the individual period data
+      // Save both the periods list and individual period data
       localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
       localStorage.setItem(`period_${newPeriod.id}`, JSON.stringify({
         name: data.name,
@@ -135,6 +149,7 @@ const PayPeriods = () => {
     setShowCreateModal(false);
   };
 
+  // Authentication handlers
   const handleSignUpSuccess = (fullName: string) => {
     setUser({ fullName });
   };
@@ -143,6 +158,7 @@ const PayPeriods = () => {
     setUser(null);
   };
 
+  // Delete period handlers
   const handleDeleteClick = (periodId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -164,6 +180,7 @@ const PayPeriods = () => {
     }
   };
 
+  // Edit period handler
   const handleEditClick = (period: PayPeriod, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -173,9 +190,11 @@ const PayPeriods = () => {
 
   return (
     <div className="container py-8 max-w-4xl">
+      {/* Header section with title and action buttons */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">My Budgets</h1>
         <div className="flex gap-2 items-center">
+          {/* Conditional rendering of auth buttons based on user state */}
           {!user ? (
             <>
               <Button variant="outline" onClick={() => setShowSignUp(true)}>
@@ -206,6 +225,7 @@ const PayPeriods = () => {
         </div>
       </div>
 
+      {/* Budget list section */}
       <div className="space-y-4">
         {periods.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
@@ -236,6 +256,7 @@ const PayPeriods = () => {
                     Created {format(period.createdAt, "PPP")}
                   </p>
                 </div>
+                {/* Action buttons for each budget */}
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
@@ -263,6 +284,7 @@ const PayPeriods = () => {
         )}
       </div>
 
+      {/* Modal components */}
       <SignUpForm
         open={showSignUp}
         onOpenChange={setShowSignUp}
@@ -276,6 +298,7 @@ const PayPeriods = () => {
         initialData={periodToEdit}
       />
 
+      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>

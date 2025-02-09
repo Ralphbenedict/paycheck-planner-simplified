@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 
+// Props interface for the DateRangePicker component
 interface DateRangePickerProps {
   startDate: Date | undefined;
   endDate: Date | undefined;
@@ -23,8 +24,12 @@ const DateRangePicker = ({
   onEndDateChange,
 }: DateRangePickerProps) => {
   const { toast } = useToast();
+  
+  // State for popover visibility
   const [startOpen, setStartOpen] = React.useState(false);
   const [endOpen, setEndOpen] = React.useState(false);
+  
+  // State for input field values
   const [startInput, setStartInput] = React.useState(
     startDate ? format(startDate, "MM/dd/yyyy") : ""
   );
@@ -32,6 +37,7 @@ const DateRangePicker = ({
     endDate ? format(endDate, "MM/dd/yyyy") : ""
   );
 
+  // Update input fields when dates change externally
   React.useEffect(() => {
     setStartInput(startDate ? format(startDate, "MM/dd/yyyy") : "");
   }, [startDate]);
@@ -40,6 +46,7 @@ const DateRangePicker = ({
     setEndInput(endDate ? format(endDate, "MM/dd/yyyy") : "");
   }, [endDate]);
 
+  // Handlers for calendar date selection
   const handleStartSelect = (date: Date | undefined) => {
     onStartDateChange(date);
     setStartOpen(false);
@@ -50,6 +57,7 @@ const DateRangePicker = ({
     setEndOpen(false);
   };
 
+  // Handlers for manual date input
   const handleStartInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setStartInput(value);
@@ -88,6 +96,7 @@ const DateRangePicker = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Start date picker */}
       <div className="space-y-2">
         <label className="block text-sm font-medium">Start Date</label>
         <div className="flex gap-2">
@@ -115,6 +124,7 @@ const DateRangePicker = ({
         </div>
       </div>
 
+      {/* End date picker */}
       <div className="space-y-2">
         <label className="block text-sm font-medium">End Date</label>
         <div className="flex gap-2">

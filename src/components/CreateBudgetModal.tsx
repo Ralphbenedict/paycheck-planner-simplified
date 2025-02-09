@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+// Define form validation schema using Zod
 const formSchema = z.object({
   name: z
     .string()
@@ -33,6 +34,7 @@ const formSchema = z.object({
     .max(250, "Description must be less than 250 characters"),
 });
 
+// Props interface for the CreateBudgetModal component
 interface CreateBudgetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -50,6 +52,8 @@ const CreateBudgetModal = ({
   initialData,
 }: CreateBudgetModalProps) => {
   const { toast } = useToast();
+  
+  // Initialize form with react-hook-form and zod validation
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -58,6 +62,7 @@ const CreateBudgetModal = ({
     },
   });
 
+  // Reset form when modal opens/closes or initialData changes
   React.useEffect(() => {
     if (open && initialData) {
       form.reset({
@@ -72,6 +77,7 @@ const CreateBudgetModal = ({
     }
   }, [open, initialData, form]);
 
+  // Form submission handler
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     onSubmit(values);
     form.reset();
@@ -85,6 +91,7 @@ const CreateBudgetModal = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            {/* Budget name field */}
             <FormField
               control={form.control}
               name="name"
@@ -98,6 +105,7 @@ const CreateBudgetModal = ({
                 </FormItem>
               )}
             />
+            {/* Budget description field */}
             <FormField
               control={form.control}
               name="description"
@@ -115,6 +123,7 @@ const CreateBudgetModal = ({
                 </FormItem>
               )}
             />
+            {/* Form action buttons */}
             <div className="flex justify-end space-x-2 pt-4">
               <Button
                 type="button"
