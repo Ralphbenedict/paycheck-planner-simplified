@@ -16,20 +16,23 @@ interface CategoryItems {
 
 interface CategoriesProps {
   categoryItems: CategoryItems;
-  setCategoryItems: (items: CategoryItems) => void;
-  availableCategories: Array<{ key: string; label: string }>;
+  setCategoryItems: React.Dispatch<React.SetStateAction<CategoryItems>>;
+  availableCategories?: Array<{ key: string; label: string }>;
 }
 
 const Categories = ({ 
   categoryItems, 
   setCategoryItems,
-  availableCategories 
+  availableCategories = Object.keys(categoryItems).map(key => ({
+    key,
+    label: key.charAt(0).toUpperCase() + key.slice(1)
+  }))
 }: CategoriesProps) => {
   const handleItemsChange = (category: string, newItems: CategoryItem[]) => {
-    setCategoryItems({
-      ...categoryItems,
+    setCategoryItems(prev => ({
+      ...prev,
       [category]: newItems,
-    });
+    }));
   };
 
   return (

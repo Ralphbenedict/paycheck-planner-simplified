@@ -5,30 +5,27 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Plus, Trash2 } from "lucide-react";
 
-interface SummaryItem {
-  key: string;
-  label: string;
-  budget: number;
-  actual: number;
-  isRemovable: boolean;
+interface SummaryData {
+  rollover: { budget: number; actual: number };
+  income: { budget: number; actual: number };
+  savings: { budget: number; actual: number };
+  bills: { budget: number; actual: number };
+  expenses: { budget: number; actual: number };
+  debt: { budget: number; actual: number };
 }
 
 interface BudgetSummaryProps {
-  summaryItems: SummaryItem[];
-  onSummaryItemsChange: (items: SummaryItem[]) => void;
+  summaryData: SummaryData;
+  setSummaryData: React.Dispatch<React.SetStateAction<SummaryData>>;
   rollover: boolean;
-  onRolloverChange: (value: boolean) => void;
-  onAddItem: (item: SummaryItem) => void;
-  onRemoveItem: (key: string) => void;
+  setRollover: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const BudgetSummary = ({
-  summaryItems,
-  onSummaryItemsChange,
+  summaryData,
+  setSummaryData,
   rollover,
-  onRolloverChange,
-  onAddItem,
-  onRemoveItem,
+  setRollover,
 }: BudgetSummaryProps) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newItemLabel, setNewItemLabel] = useState("");
@@ -37,28 +34,23 @@ const BudgetSummary = ({
     if (!newItemLabel.trim()) return;
     
     const key = newItemLabel.toLowerCase().replace(/\s+/g, '_');
-    onAddItem({
-      key,
-      label: newItemLabel,
-      budget: 0,
-      actual: 0,
-      isRemovable: true
-    });
+    setSummaryData(prev => ({
+      ...prev,
+      [key]: { budget: 0, actual: 0 }
+    }));
     setNewItemLabel("");
     setIsAddingNew(false);
   };
 
   const calculateTotal = () => {
-    const total = summaryItems.reduce((acc, item) => {
-      if (!rollover && item.key === 'rollover') return acc;
-      const multiplier = ['income', 'rollover'].includes(item.key) ? 1 : -1;
+    return Object.entries(summaryData).reduce((acc, [key, value]) => {
+      if (!rollover && key === 'rollover') return acc;
+      const multiplier = ['income', 'rollover'].includes(key) ? 1 : -1;
       return {
-        budget: acc.budget + (item.budget * multiplier),
-        actual: acc.actual + (item.actual * multiplier)
+        budget: acc.budget + (value.budget * multiplier),
+        actual: acc.actual + (value.actual * multiplier)
       };
     }, { budget: 0, actual: 0 });
-
-    return total;
   };
 
   return (
@@ -70,37 +62,40 @@ const BudgetSummary = ({
         <div className="col-span-2"></div>
       </div>
 
-      {summaryItems.map((item) => (
-        <div key={item.key} className="flex items-center gap-2">
+      {Object.entries(summaryData).map(([key, value]) => (
+        <div key={key} className="flex items-center gap-2">
           <div className="flex-1">
             <BudgetRow
-              label={item.label}
-              budgetValue={item.budget}
-              actualValue={item.actual}
-              onBudgetChange={(value) => {
-                const newItems = summaryItems.map((i) =>
-                  i.key === item.key ? { ...i, budget: value } : i
-                );
-                onSummaryItemsChange(newItems);
+              label={key.toUpperCase()}
+              budgetValue={value.budget}
+              actualValue={value.actual}
+              onBudgetChange={(newValue) => {
+                setSummaryData(prev => ({
+                  ...prev,
+                  [key]: { ...prev[key], budget: newValue }
+                }));
               }}
-              onActualChange={(value) => {
-                const newItems = summaryItems.map((i) =>
-                  i.key === item.key ? { ...i, actual: value } : i
-                );
-                onSummaryItemsChange(newItems);
+              onActualChange={(newValue) => {
+                setSummaryData(prev => ({
+                  ...prev,
+                  [key]: { ...prev[key], actual: newValue }
+                }));
               }}
-              isCheckbox={item.key === 'rollover'}
-              checked={item.key === 'rollover' ? rollover : undefined}
+              isCheckbox={key === 'rollover'}
+              checked={key === 'rollover' ? rollover : undefined}
               onCheckChange={
-                item.key === 'rollover' ? onRolloverChange : undefined
+                key === 'rollover' ? setRollover : undefined
               }
             />
           </div>
-          {item.isRemovable && (
+          {key !== 'rollover' && (
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onRemoveItem(item.key)}
+              onClick={() => {
+                const { [key]: removed, ...rest } = summaryData;
+                setSummaryData(rest as SummaryData);
+              }}
               className="h-8 w-8"
             >
               <Trash2 className="h-4 w-4" />

@@ -12,6 +12,10 @@ interface CategoryItem {
   actual: number;
 }
 
+interface CategoryItems {
+  [key: string]: CategoryItem[];
+}
+
 const Index = () => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
@@ -20,17 +24,19 @@ const Index = () => {
     rollover: { budget: 0, actual: 0 },
     income: { budget: 0, actual: 0 },
     savings: { budget: 0, actual: 0 },
+    investments: { budget: 0, actual: 0 },
     bills: { budget: 0, actual: 0 },
     expenses: { budget: 0, actual: 0 },
     debt: { budget: 0, actual: 0 },
   });
 
-  const [categoryItems, setCategoryItems] = useState({
-    income: [] as CategoryItem[],
-    savings: [] as CategoryItem[],
-    bills: [] as CategoryItem[],
-    expenses: [] as CategoryItem[],
-    debt: [] as CategoryItem[],
+  const [categoryItems, setCategoryItems] = useState<CategoryItems>({
+    income: [],
+    savings: [],
+    investments: [],
+    bills: [],
+    expenses: [],
+    debt: [],
   });
 
   return (
