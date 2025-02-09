@@ -40,23 +40,48 @@ interface CreateBudgetModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: z.infer<typeof formSchema>) => void;
+  initialData?: {
+    name: string;
+    description: string;
+    startDate?: Date;
+    endDate?: Date;
+  } | null;
 }
 
 const CreateBudgetModal = ({
   open,
   onOpenChange,
   onSubmit,
+  initialData,
 }: CreateBudgetModalProps) => {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      startDate: undefined,
-      endDate: undefined,
+      name: initialData?.name || "",
+      description: initialData?.description || "",
+      startDate: initialData?.startDate,
+      endDate: initialData?.endDate,
     },
   });
+
+  React.useEffect(() => {
+    if (open && initialData) {
+      form.reset({
+        name: initialData.name,
+        description: initialData.description,
+        startDate: initialData.startDate,
+        endDate: initialData.endDate,
+      });
+    } else if (!open) {
+      form.reset({
+        name: "",
+        description: "",
+        startDate: undefined,
+        endDate: undefined,
+      });
+    }
+  }, [open, initialData, form]);
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     if (values.startDate && values.endDate && values.endDate < values.startDate) {
@@ -75,7 +100,7 @@ const CreateBudgetModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create New Budget</DialogTitle>
+          <DialogTitle>{initialData ? "Edit Budget" : "Create New Budget"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
@@ -130,7 +155,7 @@ const CreateBudgetModal = ({
               >
                 Cancel
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit">{initialData ? "Update" : "Submit"}</Button>
             </div>
           </form>
         </Form>

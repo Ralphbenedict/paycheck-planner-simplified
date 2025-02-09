@@ -37,6 +37,7 @@ const PayPeriods = () => {
   const [showCreateModal, setShowCreateModal] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [periodToDelete, setPeriodToDelete] = React.useState<string | null>(null);
+  const [periodToEdit, setPeriodToEdit] = React.useState<PayPeriod | null>(null);
   const [user, setUser] = React.useState<{ fullName: string } | null>(null);
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
@@ -60,20 +61,37 @@ const PayPeriods = () => {
     startDate: Date | undefined;
     endDate: Date | undefined;
   }) => {
-    const newPeriod: PayPeriod = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: data.name,
-      description: data.description,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      createdAt: new Date(),
-    };
+    if (periodToEdit) {
+      // Update existing period
+      const updatedPeriods = periods.map((p) =>
+        p.id === periodToEdit.id
+          ? { ...p, ...data }
+          : p
+      );
+      setPeriods(updatedPeriods);
+      localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
+      setPeriodToEdit(null);
+      toast({
+        title: "Budget updated",
+        description: "The budget has been successfully updated.",
+      });
+    } else {
+      // Create new period
+      const newPeriod: PayPeriod = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: data.name,
+        description: data.description,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        createdAt: new Date(),
+      };
 
-    const updatedPeriods = [...periods, newPeriod];
-    setPeriods(updatedPeriods);
-    localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
+      const updatedPeriods = [...periods, newPeriod];
+      setPeriods(updatedPeriods);
+      localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
+      navigate(`/period/${newPeriod.id}`);
+    }
     setShowCreateModal(false);
-    navigate(`/period/${newPeriod.id}`);
   };
 
   const handleSignUpSuccess = (fullName: string) => {
@@ -105,6 +123,13 @@ const PayPeriods = () => {
     }
   };
 
+  const handleEditClick = (period: PayPeriod, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPeriodToEdit(period);
+    setShowCreateModal(true);
+  };
+
   return (
     <div className="container py-8 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
@@ -130,7 +155,10 @@ const PayPeriods = () => {
               </Button>
             </>
           )}
-          <Button onClick={() => setShowCreateModal(true)}>
+          <Button onClick={() => {
+            setPeriodToEdit(null);
+            setShowCreateModal(true);
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             New Budget
           </Button>
@@ -168,15 +196,14 @@ const PayPeriods = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Link
-                    to={`/period/${period.id}`}
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     className="text-muted-foreground hover:text-primary"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => handleEditClick(period, e)}
                   >
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                    <Pencil className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -205,6 +232,7 @@ const PayPeriods = () => {
         open={showCreateModal}
         onOpenChange={setShowCreateModal}
         onSubmit={createNewPeriod}
+        initialData={periodToEdit}
       />
 
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -232,4 +260,3 @@ const PayPeriods = () => {
 };
 
 export default PayPeriods;
-
