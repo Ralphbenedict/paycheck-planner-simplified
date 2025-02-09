@@ -5,15 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { LogIn } from "lucide-react";
+import { LogIn, Check, AlertTriangle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface SignUpFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSignUpSuccess: (fullName: string) => void;
 }
 
-const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
+const SignUpForm = ({ open, onOpenChange, onSignUpSuccess }: SignUpFormProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = React.useState({
     fullName: "",
@@ -23,6 +24,7 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
   });
 
   const [passwordError, setPasswordError] = React.useState<string>("");
+  const [passwordStrength, setPasswordStrength] = React.useState<"weak" | "strong" | null>(null);
 
   const validatePassword = (password: string) => {
     if (password.length < 8) {
@@ -41,6 +43,17 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
       return "Password must contain at least one special character (!@#$%^&*)";
     }
     return "";
+  };
+
+  const calculatePasswordStrength = (password: string) => {
+    const hasLength = password.length >= 12;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumbers = /[0-9]/.test(password);
+    const hasSpecialChars = /[!@#$%^&*]/.test(password);
+    
+    const strongPassword = hasLength && hasUpperCase && hasLowerCase && hasNumbers && hasSpecialChars;
+    return strongPassword ? "strong" : "weak";
   };
 
   const generateStrongPassword = () => {
@@ -77,6 +90,11 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
     const newPassword = e.target.value;
     setFormData({ ...formData, password: newPassword });
     setPasswordError(validatePassword(newPassword));
+    if (newPassword) {
+      setPasswordStrength(calculatePasswordStrength(newPassword));
+    } else {
+      setPasswordStrength(null);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -92,7 +110,8 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
       title: "Account created",
       description: "Your account has been created successfully. You can now log in.",
     });
-    onOpenChange(false); // Close the dialog after successful signup
+    onSignUpSuccess(formData.fullName);
+    onOpenChange(false);
     setFormData({
       fullName: "",
       email: "",
@@ -148,16 +167,36 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
                 Suggest Strong Password
               </Button>
             </div>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={handlePasswordChange}
-              required
-              className={passwordError ? "border-red-500" : ""}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type="password"
+                value={formData.password}
+                onChange={handlePasswordChange}
+                required
+                className={`${passwordError ? "border-red-500" : ""} ${
+                  passwordStrength === "strong" ? "border-green-500" : ""
+                }`}
+              />
+              {passwordStrength && !passwordError && (
+                <div className="absolute right-3 top-2.5">
+                  {passwordStrength === "strong" ? (
+                    <Check className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  )}
+                </div>
+              )}
+            </div>
             {passwordError && (
               <p className="text-sm text-red-500">{passwordError}</p>
+            )}
+            {passwordStrength && !passwordError && (
+              <p className={`text-sm ${
+                passwordStrength === "strong" ? "text-green-500" : "text-yellow-500"
+              }`}>
+                {passwordStrength === "strong" ? "Strong password" : "Weak password"}
+              </p>
             )}
             <p className="text-sm text-gray-500">
               Password must be at least 8 characters long and contain at least one uppercase letter,

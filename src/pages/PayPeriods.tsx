@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, UserPlus, LogIn } from "lucide-react";
+import { Plus, UserPlus, LogIn, LogOut } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import SignUpForm from "@/components/SignUpForm";
@@ -19,6 +19,7 @@ const PayPeriods = () => {
   const navigate = useNavigate();
   const [showSignUp, setShowSignUp] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
+  const [user, setUser] = React.useState<{ fullName: string } | null>(null);
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
     return savedPeriods
@@ -45,19 +46,39 @@ const PayPeriods = () => {
     navigate(`/period/${newPeriod.id}`);
   };
 
+  const handleSignUpSuccess = (fullName: string) => {
+    setUser({ fullName });
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+  };
+
   return (
     <div className="container py-8 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">My Budgets</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowSignUp(true)}>
-            <UserPlus className="h-4 w-4 mr-2" />
-            Sign Up
-          </Button>
-          <Button variant="outline" onClick={() => setShowLogin(true)}>
-            <LogIn className="h-4 w-4 mr-2" />
-            Login
-          </Button>
+        <div className="flex gap-2 items-center">
+          {!user ? (
+            <>
+              <Button variant="outline" onClick={() => setShowSignUp(true)}>
+                <UserPlus className="h-4 w-4 mr-2" />
+                Sign Up
+              </Button>
+              <Button variant="outline" onClick={() => setShowLogin(true)}>
+                <LogIn className="h-4 w-4 mr-2" />
+                Login
+              </Button>
+            </>
+          ) : (
+            <>
+              <span className="text-sm mr-4">Hi, {user.fullName}!</span>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </>
+          )}
           <Button onClick={createNewPeriod}>
             <Plus className="h-4 w-4 mr-2" />
             New Budget
@@ -100,7 +121,11 @@ const PayPeriods = () => {
         )}
       </div>
 
-      <SignUpForm open={showSignUp} onOpenChange={setShowSignUp} />
+      <SignUpForm 
+        open={showSignUp} 
+        onOpenChange={setShowSignUp} 
+        onSignUpSuccess={handleSignUpSuccess}
+      />
       <LoginForm open={showLogin} onOpenChange={setShowLogin} />
     </div>
   );
