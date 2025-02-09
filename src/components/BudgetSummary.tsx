@@ -5,15 +5,17 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Plus, Trash2 } from "lucide-react";
 
+// Interface for tracking budget and actual amounts by category
 interface SummaryData {
   [key: string]: { budget: number; actual: number };
 }
 
+// Props interface defines required data and callbacks
 interface BudgetSummaryProps {
-  summaryData: SummaryData;
-  setSummaryData: React.Dispatch<React.SetStateAction<SummaryData>>;
-  rollover: boolean;
-  setRollover: (value: boolean) => void;
+  summaryData: SummaryData;     // Current budget data by category
+  setSummaryData: React.Dispatch<React.SetStateAction<SummaryData>>;  // Update handler
+  rollover: boolean;            // Whether to include previous period's balance
+  setRollover: (value: boolean) => void;  // Toggle rollover setting
 }
 
 const BudgetSummary = ({
@@ -22,24 +24,31 @@ const BudgetSummary = ({
   rollover,
   setRollover,
 }: BudgetSummaryProps) => {
+  // State for adding new budget categories
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newItemLabel, setNewItemLabel] = useState("");
 
+  // Handler for adding new budget categories
   const handleAddNewItem = () => {
     if (!newItemLabel.trim()) return;
     
+    // Convert category name to snake_case for consistency
     const key = newItemLabel.toLowerCase().replace(/\s+/g, '_');
     setSummaryData(prev => ({
       ...prev,
-      [key]: { budget: 0, actual: 0 }
+      [key]: { budget: 0, actual: 0 }  // Initialize with zero values
     }));
     setNewItemLabel("");
     setIsAddingNew(false);
   };
 
+  // Calculate total budget and actual amounts
   const calculateTotal = () => {
     return Object.entries(summaryData).reduce((acc, [key, value]) => {
+      // Skip rollover if disabled
       if (!rollover && key === 'rollover') return acc;
+      
+      // Income and rollover add to total, expenses subtract
       const multiplier = ['income', 'rollover'].includes(key) ? 1 : -1;
       return {
         budget: acc.budget + (value.budget * multiplier),
@@ -50,6 +59,7 @@ const BudgetSummary = ({
 
   return (
     <div className="space-y-4">
+      {/* Column headers */}
       <div className="grid grid-cols-12 gap-4 mb-4">
         <div className="col-span-4"></div>
         <h3 className="col-span-3 text-right font-semibold">BUDGET</h3>
@@ -57,6 +67,7 @@ const BudgetSummary = ({
         <div className="col-span-2"></div>
       </div>
 
+      {/* Budget rows for each category */}
       {Object.entries(summaryData).map(([key, value]) => (
         <div key={key} className="flex items-center gap-2">
           <div className="flex-1">
@@ -85,6 +96,7 @@ const BudgetSummary = ({
               }
             />
           </div>
+          {/* Allow deletion of custom categories */}
           {key !== 'rollover' && (
             <Button
               variant="ghost"
@@ -101,6 +113,7 @@ const BudgetSummary = ({
         </div>
       ))}
 
+      {/* UI for adding new budget categories */}
       {isAddingNew ? (
         <div className="flex items-center gap-2">
           <Input
@@ -136,6 +149,7 @@ const BudgetSummary = ({
         </Button>
       )}
 
+      {/* Total summary row */}
       <div className="border-t pt-4">
         <BudgetRow
           label="TOTAL"
@@ -150,3 +164,4 @@ const BudgetSummary = ({
 };
 
 export default BudgetSummary;
+

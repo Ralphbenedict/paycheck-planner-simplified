@@ -20,64 +20,66 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-// Define the structure for a pay period
+// Define our data structure for a budget period
+// This helps TypeScript understand what properties a budget period should have
 interface PayPeriod {
-  id: string;
-  name: string;
-  description: string;
-  startDate: Date | undefined;
-  endDate: Date | undefined;
-  createdAt: Date;
+  id: string;          // Unique identifier for each budget
+  name: string;        // User-friendly name for the budget
+  description: string; // Optional description to provide more context
+  startDate: Date | undefined;  // When this budget period begins
+  endDate: Date | undefined;    // When this budget period ends
+  createdAt: Date;     // Timestamp of when this budget was created
 }
 
-// Define the structure for budget category items
+// Define the structure for individual budget items within categories
 interface CategoryItem {
-  id: string;
-  label: string;
-  budget: number;
-  actual: number;
+  id: string;     // Unique identifier for each budget item
+  label: string;  // Name of the budget item (e.g., "Rent", "Groceries")
+  budget: number; // Planned amount for this item
+  actual: number; // Actual spent amount for this item
 }
 
-// Map of category names to their respective items
+// Organize budget items by category (e.g., bills, expenses, etc.)
 interface CategoryItems {
   [key: string]: CategoryItem[];
 }
 
-// Structure for summary data of budget categories
+// Track total budgeted and actual amounts for each main category
 interface SummaryData {
   [key: string]: { budget: number; actual: number };
 }
 
-// Default summary data with zero values for all categories
+// Initialize summary data with zero values for all categories
 const DEFAULT_SUMMARY_DATA: SummaryData = {
-  rollover: { budget: 0, actual: 0 },
-  income: { budget: 0, actual: 0 },
-  savings: { budget: 0, actual: 0 },
-  investments: { budget: 0, actual: 0 },
-  bills: { budget: 0, actual: 0 },
-  expenses: { budget: 0, actual: 0 },
-  debt: { budget: 0, actual: 0 }
+  rollover: { budget: 0, actual: 0 },    // Previous period's remaining balance
+  income: { budget: 0, actual: 0 },      // Expected and actual income
+  savings: { budget: 0, actual: 0 },     // Planned and actual savings
+  investments: { budget: 0, actual: 0 },  // Investment allocations
+  bills: { budget: 0, actual: 0 },       // Fixed monthly expenses
+  expenses: { budget: 0, actual: 0 },    // Variable expenses
+  debt: { budget: 0, actual: 0 }         // Debt payments
 };
 
-// List of default budget categories
+// Main categories available for budget planning
 const DEFAULT_CATEGORIES = ['income', 'savings', 'investments', 'bills', 'expenses', 'debt'];
 
 const PayPeriods = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  // State management for modal visibility
+  // State management for UI modals and dialogs
   const [showSignUp, setShowSignUp] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
   const [showCreateModal, setShowCreateModal] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   
-  // State for managing period operations
+  // State for managing budget period operations
   const [periodToDelete, setPeriodToDelete] = React.useState<string | null>(null);
   const [periodToEdit, setPeriodToEdit] = React.useState<PayPeriod | null>(null);
   const [user, setUser] = React.useState<{ fullName: string } | null>(null);
   
-  // Initialize periods from localStorage with proper date parsing
+  // Load saved budget periods from localStorage
+  // We parse dates properly since JSON.parse doesn't handle Date objects
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
     return savedPeriods
@@ -94,7 +96,7 @@ const PayPeriods = () => {
       : [];
   });
 
-  // Handler for creating or updating a budget period
+  // Handler for creating or updating budget periods
   const createNewPeriod = (data: {
     name: string;
     description: string;
@@ -102,7 +104,7 @@ const PayPeriods = () => {
     endDate: Date | undefined;
   }) => {
     if (periodToEdit) {
-      // Update existing period logic
+      // Update existing budget logic
       const updatedPeriods = periods.map((p) =>
         p.id === periodToEdit.id
           ? { ...p, ...data }
@@ -116,9 +118,9 @@ const PayPeriods = () => {
         description: "The budget has been successfully updated.",
       });
     } else {
-      // Create new period logic
+      // Create new budget logic
       const newPeriod: PayPeriod = {
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substr(2, 9), // Generate unique ID
         name: data.name,
         description: data.description,
         startDate: data.startDate,
@@ -129,7 +131,7 @@ const PayPeriods = () => {
       const updatedPeriods = [...periods, newPeriod];
       setPeriods(updatedPeriods);
       
-      // Save both the periods list and individual period data
+      // Save both the list of periods and individual period data
       localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
       localStorage.setItem(`period_${newPeriod.id}`, JSON.stringify({
         name: data.name,
@@ -144,21 +146,23 @@ const PayPeriods = () => {
         rollover: false,
       }));
       
+      // Navigate to the new budget's detail page
       navigate(`/period/${newPeriod.id}`);
     }
     setShowCreateModal(false);
   };
 
-  // Authentication handlers
+  // Authentication success handler
   const handleSignUpSuccess = (fullName: string) => {
     setUser({ fullName });
   };
 
+  // Logout handler
   const handleLogout = () => {
     setUser(null);
   };
 
-  // Delete period handlers
+  // Budget deletion handlers
   const handleDeleteClick = (periodId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -180,7 +184,7 @@ const PayPeriods = () => {
     }
   };
 
-  // Edit period handler
+  // Budget edit handler
   const handleEditClick = (period: PayPeriod, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -190,11 +194,11 @@ const PayPeriods = () => {
 
   return (
     <div className="container py-8 max-w-4xl">
-      {/* Header section with title and action buttons */}
+      {/* Header section with title and user actions */}
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">My Budgets</h1>
         <div className="flex gap-2 items-center">
-          {/* Conditional rendering of auth buttons based on user state */}
+          {/* Show different buttons based on user authentication status */}
           {!user ? (
             <>
               <Button variant="outline" onClick={() => setShowSignUp(true)}>
@@ -225,13 +229,15 @@ const PayPeriods = () => {
         </div>
       </div>
 
-      {/* Budget list section */}
+      {/* List of budget periods */}
       <div className="space-y-4">
         {periods.length === 0 ? (
+          // Show message when no budgets exist
           <div className="text-center py-8 text-gray-500">
             No budgets yet. Create your first one!
           </div>
         ) : (
+          // Display each budget period as a card
           periods.map((period) => (
             <Link
               key={period.id}
@@ -256,7 +262,7 @@ const PayPeriods = () => {
                     Created {format(period.createdAt, "PPP")}
                   </p>
                 </div>
-                {/* Action buttons for each budget */}
+                {/* Action buttons for editing and deleting budgets */}
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
@@ -284,7 +290,7 @@ const PayPeriods = () => {
         )}
       </div>
 
-      {/* Modal components */}
+      {/* Modal components for user interactions */}
       <SignUpForm
         open={showSignUp}
         onOpenChange={setShowSignUp}
@@ -298,7 +304,7 @@ const PayPeriods = () => {
         initialData={periodToEdit}
       />
 
-      {/* Delete confirmation dialog */}
+      {/* Confirmation dialog for deleting budgets */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -324,3 +330,4 @@ const PayPeriods = () => {
 };
 
 export default PayPeriods;
+
