@@ -20,8 +20,40 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
     acceptTerms: false,
   });
 
+  const [passwordError, setPasswordError] = React.useState<string>("");
+
+  const validatePassword = (password: string) => {
+    if (password.length < 8) {
+      return "Password must be at least 8 characters long";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    if (!/[0-9]/.test(password)) {
+      return "Password must contain at least one number";
+    }
+    if (!/[!@#$%^&*]/.test(password)) {
+      return "Password must contain at least one special character (!@#$%^&*)";
+    }
+    return "";
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPassword = e.target.value;
+    setFormData({ ...formData, password: newPassword });
+    setPasswordError(validatePassword(newPassword));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const passwordValidationError = validatePassword(formData.password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
+      return;
+    }
     // TODO: Implement signup logic after Supabase integration
     console.log("Form submitted:", formData);
   };
@@ -63,11 +95,17 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
               id="password"
               type="password"
               value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
+              onChange={handlePasswordChange}
               required
+              className={passwordError ? "border-red-500" : ""}
             />
+            {passwordError && (
+              <p className="text-sm text-red-500">{passwordError}</p>
+            )}
+            <p className="text-sm text-gray-500">
+              Password must be at least 8 characters long and contain at least one uppercase letter,
+              one lowercase letter, one number, and one special character (!@#$%^&*).
+            </p>
           </div>
           <div className="flex items-center space-x-2">
             <Checkbox
