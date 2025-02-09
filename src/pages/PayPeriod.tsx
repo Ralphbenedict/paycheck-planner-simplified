@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BudgetSection from "@/components/BudgetSection";
@@ -215,8 +216,8 @@ const PayPeriod = () => {
             }));
           }}
           rollover={periodData.rollover}
-          setRollover={(value) =>
-            setPeriodData({ ...periodData, rollover: value })
+          setRollover={(checked: boolean) => 
+            setPeriodData(prev => ({ ...prev, rollover: checked }))
           }
         />
       </BudgetSection>

@@ -5,12 +5,6 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Plus, Trash2 } from "lucide-react";
 
-interface SummaryItem {
-  key: string;
-  budget: number;
-  actual: number;
-}
-
 interface SummaryData {
   [key: string]: { budget: number; actual: number };
 }
@@ -19,7 +13,7 @@ interface BudgetSummaryProps {
   summaryData: SummaryData;
   setSummaryData: React.Dispatch<React.SetStateAction<SummaryData>>;
   rollover: boolean;
-  setRollover: React.Dispatch<React.SetStateAction<boolean>>;
+  setRollover: (value: boolean) => void;
 }
 
 const BudgetSummary = ({
@@ -85,7 +79,9 @@ const BudgetSummary = ({
               isCheckbox={key === 'rollover'}
               checked={key === 'rollover' ? rollover : undefined}
               onCheckChange={
-                key === 'rollover' ? setRollover : undefined
+                key === 'rollover' 
+                  ? (checked: boolean) => setRollover(checked)
+                  : undefined
               }
             />
           </div>
