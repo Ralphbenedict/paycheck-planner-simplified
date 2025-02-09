@@ -2,7 +2,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus, LogIn } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 
@@ -42,17 +42,27 @@ const PayPeriods = () => {
   return (
     <div className="container py-8 max-w-4xl">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">Pay Periods</h1>
-        <Button onClick={createNewPeriod}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Period
-        </Button>
+        <h1 className="text-2xl font-bold">My Budgets</h1>
+        <div className="flex gap-2">
+          <Button variant="outline">
+            <UserPlus className="h-4 w-4 mr-2" />
+            Sign Up
+          </Button>
+          <Button variant="outline">
+            <LogIn className="h-4 w-4 mr-2" />
+            Login
+          </Button>
+          <Button onClick={createNewPeriod}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Budget
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-4">
         {periods.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            No pay periods yet. Create your first one!
+            No budgets yet. Create your first one!
           </div>
         ) : (
           periods.map((period) => (
