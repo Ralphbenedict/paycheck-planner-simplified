@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Google } from "lucide-react";
+import { LogIn } from "lucide-react";
 
 interface SignUpFormProps {
   open: boolean;
@@ -93,7 +93,7 @@ const SignUpForm = ({ open, onOpenChange }: SignUpFormProps) => {
               className="w-full"
               onClick={() => console.log("Google sign up clicked")}
             >
-              <Google className="mr-2 h-4 w-4" />
+              <LogIn className="mr-2 h-4 w-4" />
               Continue with Google
             </Button>
           </div>
