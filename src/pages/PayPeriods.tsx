@@ -153,12 +153,6 @@ const PayPeriods = () => {
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium">{period.name}</h3>
-                    <Link
-                      to={`/period/${period.id}`}
-                      className="text-muted-foreground hover:text-primary"
-                    >
-                      <Pencil className="h-4 w-4" />
-                    </Link>
                   </div>
                   <p className="text-sm text-gray-500">{period.description}</p>
                   <p className="text-sm text-gray-500 mt-1">
@@ -174,6 +168,15 @@ const PayPeriods = () => {
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
+                  <Link
+                    to={`/period/${period.id}`}
+                    className="text-muted-foreground hover:text-primary"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Button variant="ghost" size="icon">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -229,3 +232,4 @@ const PayPeriods = () => {
 };
 
 export default PayPeriods;
+
