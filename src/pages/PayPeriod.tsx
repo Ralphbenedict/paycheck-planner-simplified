@@ -17,28 +17,37 @@ interface CategoryItem {
   actual: number;
 }
 
+interface SummaryItem {
+  key: string;
+  label: string;
+  budget: number;
+  actual: number;
+  isRemovable: boolean;
+}
+
 interface PeriodData {
   name: string;
   description: string;
   startDate: Date | undefined;
   endDate: Date | undefined;
-  summaryData: {
-    rollover: { budget: number; actual: number };
-    income: { budget: number; actual: number };
-    savings: { budget: number; actual: number };
-    bills: { budget: number; actual: number };
-    expenses: { budget: number; actual: number };
-    debt: { budget: number; actual: number };
-  };
+  summaryItems: SummaryItem[];
   categoryItems: {
-    income: CategoryItem[];
-    savings: CategoryItem[];
-    bills: CategoryItem[];
-    expenses: CategoryItem[];
-    debt: CategoryItem[];
+    [key: string]: CategoryItem[];
   };
   rollover: boolean;
 }
+
+const DEFAULT_SUMMARY_ITEMS: SummaryItem[] = [
+  { key: 'rollover', label: 'Rollover', budget: 0, actual: 0, isRemovable: false },
+  { key: 'income', label: 'Income', budget: 0, actual: 0, isRemovable: true },
+  { key: 'savings', label: 'Savings', budget: 0, actual: 0, isRemovable: true },
+  { key: 'investments', label: 'Investments', budget: 0, actual: 0, isRemovable: true },
+  { key: 'bills', label: 'Bills', budget: 0, actual: 0, isRemovable: true },
+  { key: 'expenses', label: 'Expenses', budget: 0, actual: 0, isRemovable: true },
+  { key: 'debt', label: 'Debt', budget: 0, actual: 0, isRemovable: true },
+];
+
+const DEFAULT_CATEGORIES = ['income', 'savings', 'investments', 'bills', 'expenses', 'debt'];
 
 const PayPeriod = () => {
   const { id } = useParams();
@@ -50,7 +59,6 @@ const PayPeriod = () => {
     const savedData = localStorage.getItem(`period_${id}`);
     if (savedData) {
       const parsed = JSON.parse(savedData);
-      // Convert date strings back to Date objects
       if (parsed.startDate) {
         parsed.startDate = new Date(parsed.startDate);
       }
@@ -59,28 +67,32 @@ const PayPeriod = () => {
       }
       setEditedName(parsed.name || "");
       setEditedDescription(parsed.description || "");
-      return parsed;
+      
+      // Ensure all default categories exist
+      const summaryItems = parsed.summaryItems || DEFAULT_SUMMARY_ITEMS;
+      const categoryItems = parsed.categoryItems || {};
+      DEFAULT_CATEGORIES.forEach(category => {
+        if (!categoryItems[category]) {
+          categoryItems[category] = [];
+        }
+      });
+      
+      return {
+        ...parsed,
+        summaryItems,
+        categoryItems
+      };
     }
     return {
       name: "",
       description: "",
       startDate: undefined,
       endDate: undefined,
-      summaryData: {
-        rollover: { budget: 0, actual: 0 },
-        income: { budget: 0, actual: 0 },
-        savings: { budget: 0, actual: 0 },
-        bills: { budget: 0, actual: 0 },
-        expenses: { budget: 0, actual: 0 },
-        debt: { budget: 0, actual: 0 },
-      },
-      categoryItems: {
-        income: [],
-        savings: [],
-        bills: [],
-        expenses: [],
-        debt: [],
-      },
+      summaryItems: DEFAULT_SUMMARY_ITEMS,
+      categoryItems: DEFAULT_CATEGORIES.reduce((acc, category) => {
+        acc[category] = [];
+        return acc;
+      }, {} as { [key: string]: CategoryItem[] }),
       rollover: false,
     };
   });
@@ -99,16 +111,16 @@ const PayPeriod = () => {
   };
 
   const calculateTotals = () => {
-    const income = periodData.summaryData.income;
-    const totalIncome = income.budget;
+    const income = periodData.summaryItems.find(item => item.key === 'income')?.budget || 0;
+    const totalIncome = income;
     
-    const totalBudgeted = Object.entries(periodData.summaryData)
-      .filter(([key]) => key !== 'income' && key !== 'rollover')
-      .reduce((sum, [_, value]) => sum + value.budget, 0);
+    const totalBudgeted = periodData.summaryItems
+      .filter(item => item.key !== 'income' && item.key !== 'rollover')
+      .reduce((sum, item) => sum + item.budget, 0);
     
-    const totalActual = Object.entries(periodData.summaryData)
-      .filter(([key]) => key !== 'income' && key !== 'rollover')
-      .reduce((sum, [_, value]) => sum + value.actual, 0);
+    const totalActual = periodData.summaryItems
+      .filter(item => item.key !== 'income' && item.key !== 'rollover')
+      .reduce((sum, item) => sum + item.actual, 0);
 
     return { totalIncome, totalBudgeted, totalActual };
   };
@@ -197,14 +209,34 @@ const PayPeriod = () => {
 
       <BudgetSection title="SUMMARY">
         <BudgetSummary
-          summaryData={periodData.summaryData}
-          setSummaryData={(newData) =>
-            setPeriodData({ ...periodData, summaryData: newData })
-          }
+          summaryItems={periodData.summaryItems}
+          onSummaryItemsChange={(newItems) => {
+            setPeriodData({ ...periodData, summaryItems: newItems });
+          }}
           rollover={periodData.rollover}
-          setRollover={(value) =>
+          onRolloverChange={(value) =>
             setPeriodData({ ...periodData, rollover: value })
           }
+          onAddItem={(newItem) => {
+            const newItems = [...periodData.summaryItems, newItem];
+            setPeriodData({
+              ...periodData,
+              summaryItems: newItems,
+              categoryItems: {
+                ...periodData.categoryItems,
+                [newItem.key]: []
+              }
+            });
+          }}
+          onRemoveItem={(key) => {
+            setPeriodData({
+              ...periodData,
+              summaryItems: periodData.summaryItems.filter(item => item.key !== key),
+              categoryItems: Object.fromEntries(
+                Object.entries(periodData.categoryItems).filter(([k]) => k !== key)
+              )
+            });
+          }}
         />
       </BudgetSection>
 
@@ -218,6 +250,10 @@ const PayPeriod = () => {
           setCategoryItems={(newItems) =>
             setPeriodData({ ...periodData, categoryItems: newItems })
           }
+          availableCategories={periodData.summaryItems.map(item => ({
+            key: item.key,
+            label: item.label
+          }))}
         />
       </BudgetSection>
     </div>

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CategoryTab from "./CategoryTab";
@@ -10,40 +11,45 @@ interface CategoryItem {
 }
 
 interface CategoryItems {
-  income: CategoryItem[];
-  savings: CategoryItem[];
-  bills: CategoryItem[];
-  expenses: CategoryItem[];
-  debt: CategoryItem[];
+  [key: string]: CategoryItem[];
 }
 
 interface CategoriesProps {
   categoryItems: CategoryItems;
   setCategoryItems: (items: CategoryItems) => void;
+  availableCategories: Array<{ key: string; label: string }>;
 }
 
-const Categories = ({ categoryItems, setCategoryItems }: CategoriesProps) => {
+const Categories = ({ 
+  categoryItems, 
+  setCategoryItems,
+  availableCategories 
+}: CategoriesProps) => {
+  const handleItemsChange = (category: string, newItems: CategoryItem[]) => {
+    setCategoryItems({
+      ...categoryItems,
+      [category]: newItems,
+    });
+  };
+
   return (
-    <Tabs defaultValue="income" className="w-full">
-      <TabsList className="grid w-full grid-cols-5">
-        <TabsTrigger value="income">Income</TabsTrigger>
-        <TabsTrigger value="savings">Savings</TabsTrigger>
-        <TabsTrigger value="bills">Bills</TabsTrigger>
-        <TabsTrigger value="expenses">Expenses</TabsTrigger>
-        <TabsTrigger value="debt">Debt</TabsTrigger>
+    <Tabs defaultValue={availableCategories[0]?.key} className="w-full">
+      <TabsList className="grid w-full" style={{ 
+        gridTemplateColumns: `repeat(${availableCategories.length}, minmax(0, 1fr))` 
+      }}>
+        {availableCategories.map(({ key, label }) => (
+          <TabsTrigger key={key} value={key}>
+            {label}
+          </TabsTrigger>
+        ))}
       </TabsList>
 
-      {Object.entries(categoryItems).map(([category, items]) => (
-        <TabsContent key={category} value={category}>
+      {availableCategories.map(({ key, label }) => (
+        <TabsContent key={key} value={key}>
           <CategoryTab
-            title={category.charAt(0).toUpperCase() + category.slice(1)}
-            items={items}
-            onItemsChange={(newItems) =>
-              setCategoryItems({
-                ...categoryItems,
-                [category]: newItems,
-              })
-            }
+            title={label}
+            items={categoryItems[key] || []}
+            onItemsChange={(newItems) => handleItemsChange(key, newItems)}
           />
         </TabsContent>
       ))}

@@ -1,106 +1,154 @@
 
-import React from "react";
+import React, { useState } from "react";
 import BudgetRow from "./BudgetRow";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Plus, Trash2 } from "lucide-react";
 
-interface SummaryData {
-  rollover: { budget: number; actual: number };
-  income: { budget: number; actual: number };
-  savings: { budget: number; actual: number };
-  bills: { budget: number; actual: number };
-  expenses: { budget: number; actual: number };
-  debt: { budget: number; actual: number };
+interface SummaryItem {
+  key: string;
+  label: string;
+  budget: number;
+  actual: number;
+  isRemovable: boolean;
 }
 
 interface BudgetSummaryProps {
-  summaryData: SummaryData;
-  setSummaryData: (data: SummaryData) => void;
+  summaryItems: SummaryItem[];
+  onSummaryItemsChange: (items: SummaryItem[]) => void;
   rollover: boolean;
-  setRollover: (value: boolean) => void;
+  onRolloverChange: (value: boolean) => void;
+  onAddItem: (item: SummaryItem) => void;
+  onRemoveItem: (key: string) => void;
 }
 
 const BudgetSummary = ({
-  summaryData,
-  setSummaryData,
+  summaryItems,
+  onSummaryItemsChange,
   rollover,
-  setRollover,
+  onRolloverChange,
+  onAddItem,
+  onRemoveItem,
 }: BudgetSummaryProps) => {
-  const calculateSummaryTotals = () => {
-    const budget =
-      (rollover ? summaryData.rollover.budget : 0) +
-      summaryData.income.budget -
-      summaryData.savings.budget -
-      summaryData.bills.budget -
-      summaryData.expenses.budget -
-      summaryData.debt.budget;
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [newItemLabel, setNewItemLabel] = useState("");
 
-    const actual =
-      (rollover ? summaryData.rollover.actual : 0) +
-      summaryData.income.actual -
-      summaryData.savings.actual -
-      summaryData.bills.actual -
-      summaryData.expenses.actual -
-      summaryData.debt.actual;
+  const handleAddNewItem = () => {
+    if (!newItemLabel.trim()) return;
+    
+    const key = newItemLabel.toLowerCase().replace(/\s+/g, '_');
+    onAddItem({
+      key,
+      label: newItemLabel,
+      budget: 0,
+      actual: 0,
+      isRemovable: true
+    });
+    setNewItemLabel("");
+    setIsAddingNew(false);
+  };
 
-    return { budget, actual };
+  const calculateTotal = () => {
+    const total = summaryItems.reduce((acc, item) => {
+      if (!rollover && item.key === 'rollover') return acc;
+      const multiplier = ['income', 'rollover'].includes(item.key) ? 1 : -1;
+      return {
+        budget: acc.budget + (item.budget * multiplier),
+        actual: acc.actual + (item.actual * multiplier)
+      };
+    }, { budget: 0, actual: 0 });
+
+    return total;
   };
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-12 gap-4 mb-4">
         <div className="col-span-4"></div>
-        <h3 className="col-span-4 text-right font-semibold">BUDGET</h3>
-        <h3 className="col-span-4 text-right font-semibold">ACTUAL</h3>
+        <h3 className="col-span-3 text-right font-semibold">BUDGET</h3>
+        <h3 className="col-span-3 text-right font-semibold">ACTUAL</h3>
+        <div className="col-span-2"></div>
       </div>
 
-      <BudgetRow
-        label="Rollover"
-        budgetValue={summaryData.rollover.budget}
-        actualValue={summaryData.rollover.actual}
-        onBudgetChange={(value) =>
-          setSummaryData({
-            ...summaryData,
-            rollover: { ...summaryData.rollover, budget: value },
-          })
-        }
-        onActualChange={(value) =>
-          setSummaryData({
-            ...summaryData,
-            rollover: { ...summaryData.rollover, actual: value },
-          })
-        }
-        isCheckbox
-        checked={rollover}
-        onCheckChange={setRollover}
-      />
+      {summaryItems.map((item) => (
+        <div key={item.key} className="flex items-center gap-2">
+          <div className="flex-1">
+            <BudgetRow
+              label={item.label}
+              budgetValue={item.budget}
+              actualValue={item.actual}
+              onBudgetChange={(value) => {
+                const newItems = summaryItems.map((i) =>
+                  i.key === item.key ? { ...i, budget: value } : i
+                );
+                onSummaryItemsChange(newItems);
+              }}
+              onActualChange={(value) => {
+                const newItems = summaryItems.map((i) =>
+                  i.key === item.key ? { ...i, actual: value } : i
+                );
+                onSummaryItemsChange(newItems);
+              }}
+              isCheckbox={item.key === 'rollover'}
+              checked={item.key === 'rollover' ? rollover : undefined}
+              onCheckChange={
+                item.key === 'rollover' ? onRolloverChange : undefined
+              }
+            />
+          </div>
+          {item.isRemovable && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onRemoveItem(item.key)}
+              className="h-8 w-8"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      ))}
 
-      {Object.entries(summaryData)
-        .filter(([key]) => key !== "rollover")
-        .map(([key, value]) => (
-          <BudgetRow
-            key={key}
-            label={key.charAt(0).toUpperCase() + key.slice(1)}
-            budgetValue={value.budget}
-            actualValue={value.actual}
-            onBudgetChange={(newValue) =>
-              setSummaryData({
-                ...summaryData,
-                [key]: { ...value, budget: newValue },
-              })
-            }
-            onActualChange={(newValue) =>
-              setSummaryData({
-                ...summaryData,
-                [key]: { ...value, actual: newValue },
-              })
-            }
+      {isAddingNew ? (
+        <div className="flex items-center gap-2">
+          <Input
+            value={newItemLabel}
+            onChange={(e) => setNewItemLabel(e.target.value)}
+            placeholder="Enter item name"
+            className="flex-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleAddNewItem();
+              if (e.key === 'Escape') setIsAddingNew(false);
+            }}
           />
-        ))}
+          <Button onClick={handleAddNewItem} size="sm">Add</Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => {
+              setIsAddingNew(false);
+              setNewItemLabel("");
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsAddingNew(true)}
+          className="mt-2"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add New Item
+        </Button>
+      )}
 
       <div className="border-t pt-4">
         <BudgetRow
-          label="BALANCE"
-          budgetValue={calculateSummaryTotals().budget}
-          actualValue={calculateSummaryTotals().actual}
+          label="TOTAL"
+          budgetValue={calculateTotal().budget}
+          actualValue={calculateTotal().actual}
           onBudgetChange={() => {}}
           onActualChange={() => {}}
         />

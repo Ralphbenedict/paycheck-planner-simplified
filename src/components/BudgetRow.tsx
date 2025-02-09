@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
@@ -27,27 +27,22 @@ const BudgetRow = ({
   onCheckChange,
   index = 0,
 }: BudgetRowProps) => {
-  const formatValue = (value: number) => {
-    return value === 0 ? "" : value.toFixed(2);
+  const [budgetInput, setBudgetInput] = useState(budgetValue.toString());
+  const [actualInput, setActualInput] = useState(actualValue.toString());
+
+  const handleInputBlur = (value: string, onChange: (value: number) => void) => {
+    const numericValue = parseFloat(value) || 0;
+    onChange(numericValue);
   };
 
-  const handleValueChange = (value: string, onChange: (value: number) => void) => {
-    // If empty string, set to 0
-    if (!value) {
-      onChange(0);
-      return;
+  const handleInputChange = (
+    value: string,
+    setInput: (value: string) => void
+  ) => {
+    // Allow empty string, numbers, and a single decimal point
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setInput(value);
     }
-
-    // Remove any non-numeric characters except decimal point
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    
-    // Ensure only one decimal point
-    const parts = numericValue.split('.');
-    const sanitizedValue = parts[0] + (parts.length > 1 ? '.' + parts[1] : '');
-    
-    // Convert to number and update
-    const numberValue = parseFloat(sanitizedValue) || 0;
-    onChange(numberValue);
   };
 
   const getValueState = (value: number) => {
@@ -67,9 +62,9 @@ const BudgetRow = ({
         "grid grid-cols-12 gap-4 mb-2 items-center p-2 rounded-lg transition-colors",
         {
           "hover:bg-gray-50": true,
-          "bg-gray-50": label === "BALANCE",
-          "bg-gradient-to-r from-[#fdfcfb] to-[#e2d1c3]/20": isEven && label !== "BALANCE",
-          "bg-gradient-to-r from-[#e6e9f0] to-[#eef1f5]/20": !isEven && label !== "BALANCE",
+          "bg-gray-50": label === "TOTAL",
+          "bg-gradient-to-r from-[#fdfcfb] to-[#e2d1c3]/20": isEven && label !== "TOTAL",
+          "bg-gradient-to-r from-[#e6e9f0] to-[#eef1f5]/20": !isEven && label !== "TOTAL",
         }
       ),
       budget: cn("relative", {
@@ -98,7 +93,7 @@ const BudgetRow = ({
             className="w-4 h-4"
           />
         )}
-        <Label className={label === "BALANCE" ? "font-semibold" : ""}>{label}</Label>
+        <Label className={label === "TOTAL" ? "font-semibold" : ""}>{label}</Label>
       </div>
       <div className={cn("col-span-4", styles.budget)}>
         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
@@ -106,11 +101,13 @@ const BudgetRow = ({
         </span>
         <Input
           type="text"
-          value={formatValue(budgetValue)}
-          onChange={(e) => handleValueChange(e.target.value, onBudgetChange)}
+          value={budgetInput}
+          onChange={(e) => handleInputChange(e.target.value, setBudgetInput)}
+          onBlur={() => handleInputBlur(budgetInput, onBudgetChange)}
           className={cn("text-right pl-6", {
-            "font-semibold": label === "BALANCE",
+            "font-semibold": label === "TOTAL",
           })}
+          readOnly={label === "TOTAL"}
         />
       </div>
       <div className={cn("col-span-4", styles.actual)}>
@@ -119,11 +116,13 @@ const BudgetRow = ({
         </span>
         <Input
           type="text"
-          value={formatValue(actualValue)}
-          onChange={(e) => handleValueChange(e.target.value, onActualChange)}
+          value={actualInput}
+          onChange={(e) => handleInputChange(e.target.value, setActualInput)}
+          onBlur={() => handleInputBlur(actualInput, onActualChange)}
           className={cn("text-right pl-6", {
-            "font-semibold": label === "BALANCE",
+            "font-semibold": label === "TOTAL",
           })}
+          readOnly={label === "TOTAL"}
         />
       </div>
     </div>
