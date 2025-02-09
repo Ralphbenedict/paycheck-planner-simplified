@@ -29,8 +29,11 @@ const DateRangePicker = ({
 
   React.useEffect(() => {
     setTempStartDate(startDate);
+  }, [startDate]);
+
+  React.useEffect(() => {
     setTempEndDate(endDate);
-  }, [startDate, endDate]);
+  }, [endDate]);
 
   const handleStartConfirm = () => {
     onStartDateChange(tempStartDate);
@@ -38,7 +41,7 @@ const DateRangePicker = ({
   };
 
   const handleEndConfirm = () => {
-    if (tempEndDate && startDate && tempEndDate < startDate) {
+    if (tempEndDate && tempStartDate && tempEndDate < tempStartDate) {
       toast({
         title: "Invalid Date Selection",
         description: "End date cannot be before start date",
@@ -48,14 +51,6 @@ const DateRangePicker = ({
     }
     onEndDateChange(tempEndDate);
     setEndOpen(false);
-  };
-
-  const handleStartSelect = (date: Date | undefined) => {
-    setTempStartDate(date);
-  };
-
-  const handleEndSelect = (date: Date | undefined) => {
-    setTempEndDate(date);
   };
 
   return (
@@ -76,21 +71,23 @@ const DateRangePicker = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={tempStartDate}
-              onSelect={handleStartSelect}
-              initialFocus
-            />
-            <div className="p-3 border-t border-border">
-              <Button
-                variant="default"
-                className="w-full"
-                onClick={handleStartConfirm}
-              >
-                <Check className="mr-2 h-4 w-4" />
-                Confirm Date
-              </Button>
+            <div>
+              <Calendar
+                mode="single"
+                selected={tempStartDate}
+                onSelect={setTempStartDate}
+                initialFocus
+              />
+              <div className="p-3 border-t border-border">
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleStartConfirm}
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Confirm Date
+                </Button>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -112,21 +109,23 @@ const DateRangePicker = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={tempEndDate}
-              onSelect={handleEndSelect}
-              initialFocus
-            />
-            <div className="p-3 border-t border-border">
-              <Button
-                variant="default"
-                className="w-full"
-                onClick={handleEndConfirm}
-              >
-                <Check className="mr-2 h-4 w-4" />
-                Confirm Date
-              </Button>
+            <div>
+              <Calendar
+                mode="single"
+                selected={tempEndDate}
+                onSelect={setTempEndDate}
+                initialFocus
+              />
+              <div className="p-3 border-t border-border">
+                <Button
+                  variant="default"
+                  className="w-full"
+                  onClick={handleEndConfirm}
+                >
+                  <Check className="mr-2 h-4 w-4" />
+                  Confirm Date
+                </Button>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
