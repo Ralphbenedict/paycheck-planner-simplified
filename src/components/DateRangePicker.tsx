@@ -36,8 +36,10 @@ const DateRangePicker = ({
   }, [endDate]);
 
   const handleStartConfirm = () => {
-    onStartDateChange(tempStartDate);
-    setStartOpen(false);
+    if (tempStartDate) {
+      onStartDateChange(tempStartDate);
+      setStartOpen(false);
+    }
   };
 
   const handleEndConfirm = () => {
@@ -49,7 +51,29 @@ const DateRangePicker = ({
       });
       return;
     }
-    onEndDateChange(tempEndDate);
+    if (tempEndDate) {
+      onEndDateChange(tempEndDate);
+      setEndOpen(false);
+    }
+  };
+
+  const handleStartSelect = (date: Date | undefined) => {
+    setTempStartDate(date);
+    onStartDateChange(date);
+    setStartOpen(false);
+  };
+
+  const handleEndSelect = (date: Date | undefined) => {
+    if (date && tempStartDate && date < tempStartDate) {
+      toast({
+        title: "Invalid Date Selection",
+        description: "End date cannot be before start date",
+        variant: "destructive",
+      });
+      return;
+    }
+    setTempEndDate(date);
+    onEndDateChange(date);
     setEndOpen(false);
   };
 
@@ -75,19 +99,9 @@ const DateRangePicker = ({
               <Calendar
                 mode="single"
                 selected={tempStartDate}
-                onSelect={setTempStartDate}
+                onSelect={handleStartSelect}
                 initialFocus
               />
-              <div className="p-3 border-t border-border">
-                <Button
-                  variant="default"
-                  className="w-full"
-                  onClick={handleStartConfirm}
-                >
-                  <Check className="mr-2 h-4 w-4" />
-                  Confirm Date
-                </Button>
-              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -113,19 +127,9 @@ const DateRangePicker = ({
               <Calendar
                 mode="single"
                 selected={tempEndDate}
-                onSelect={setTempEndDate}
+                onSelect={handleEndSelect}
                 initialFocus
               />
-              <div className="p-3 border-t border-border">
-                <Button
-                  variant="default"
-                  className="w-full"
-                  onClick={handleEndConfirm}
-                >
-                  <Check className="mr-2 h-4 w-4" />
-                  Confirm Date
-                </Button>
-              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -135,4 +139,3 @@ const DateRangePicker = ({
 };
 
 export default DateRangePicker;
-
