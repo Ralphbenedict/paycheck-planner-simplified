@@ -7,24 +7,27 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import PayPeriods from "./pages/PayPeriods";
 import PayPeriod from "./pages/PayPeriod";
 import NotFound from "./pages/NotFound";
+import { useState } from "react";
 
-const queryClient = new QueryClient();
+const App = () => {
+  const [queryClient] = useState(() => new QueryClient());
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/periods" replace />} />
-          <Route path="/periods" element={<PayPeriods />} />
-          <Route path="/period/:id" element={<PayPeriod />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/periods" replace />} />
+            <Route path="/periods" element={<PayPeriods />} />
+            <Route path="/period/:id" element={<PayPeriod />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
