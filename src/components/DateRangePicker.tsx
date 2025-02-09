@@ -1,10 +1,10 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Check } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -22,18 +22,11 @@ const DateRangePicker = ({
   onEndDateChange,
 }: DateRangePickerProps) => {
   const { toast } = useToast();
-  const [startOpen, setStartOpen] = useState(false);
-  const [endOpen, setEndOpen] = useState(false);
-  const [tempStartDate, setTempStartDate] = useState<Date | undefined>(startDate);
-  const [tempEndDate, setTempEndDate] = useState<Date | undefined>(endDate);
+  const [startOpen, setStartOpen] = React.useState(false);
+  const [endOpen, setEndOpen] = React.useState(false);
 
-  const handleStartConfirm = () => {
-    onStartDateChange(tempStartDate);
-    setStartOpen(false);
-  };
-
-  const handleEndConfirm = () => {
-    if (tempEndDate && startDate && tempEndDate < startDate) {
+  const handleEndDateSelect = (date: Date | undefined) => {
+    if (date && startDate && date < startDate) {
       toast({
         title: "Invalid Date Selection",
         description: "End date cannot be before start date",
@@ -41,8 +34,13 @@ const DateRangePicker = ({
       });
       return;
     }
-    onEndDateChange(tempEndDate);
+    onEndDateChange(date);
     setEndOpen(false);
+  };
+
+  const handleStartDateSelect = (date: Date | undefined) => {
+    onStartDateChange(date);
+    setStartOpen(false);
   };
 
   return (
@@ -62,23 +60,13 @@ const DateRangePicker = ({
               {startDate ? format(startDate, "PPP") : "Pick a date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
+          <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"
-              selected={tempStartDate}
-              onSelect={setTempStartDate}
+              selected={startDate}
+              onSelect={handleStartDateSelect}
               initialFocus
             />
-            <div className="p-3 border-t border-border">
-              <Button
-                variant="default"
-                className="w-full"
-                onClick={handleStartConfirm}
-              >
-                <Check className="mr-2 h-4 w-4" />
-                Confirm Date
-              </Button>
-            </div>
           </PopoverContent>
         </Popover>
       </div>
@@ -98,23 +86,13 @@ const DateRangePicker = ({
               {endDate ? format(endDate, "PPP") : "Pick a date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
+          <PopoverContent className="w-auto p-0" align="start">
             <Calendar
               mode="single"
-              selected={tempEndDate}
-              onSelect={setTempEndDate}
+              selected={endDate}
+              onSelect={handleEndDateSelect}
               initialFocus
             />
-            <div className="p-3 border-t border-border">
-              <Button
-                variant="default"
-                className="w-full"
-                onClick={handleEndConfirm}
-              >
-                <Check className="mr-2 h-4 w-4" />
-                Confirm Date
-              </Button>
-            </div>
           </PopoverContent>
         </Popover>
       </div>
@@ -123,3 +101,4 @@ const DateRangePicker = ({
 };
 
 export default DateRangePicker;
+
