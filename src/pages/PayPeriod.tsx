@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BudgetSection from "@/components/BudgetSection";
@@ -6,7 +7,9 @@ import BudgetSummary from "@/components/BudgetSummary";
 import Categories from "@/components/Categories";
 import BudgetGraphs from "@/components/BudgetGraphs";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Pencil, Check, X } from "lucide-react";
 
 interface CategoryItem {
   id: string;
@@ -16,6 +19,8 @@ interface CategoryItem {
 }
 
 interface PeriodData {
+  name: string;
+  description: string;
   startDate: Date | undefined;
   endDate: Date | undefined;
   summaryData: {
@@ -39,6 +44,9 @@ interface PeriodData {
 const PayPeriod = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedName, setEditedName] = useState("");
+  const [editedDescription, setEditedDescription] = useState("");
   const [periodData, setPeriodData] = useState<PeriodData>(() => {
     const savedData = localStorage.getItem(`period_${id}`);
     if (savedData) {
@@ -48,9 +56,13 @@ const PayPeriod = () => {
         }
         return value;
       });
+      setEditedName(parsed.name || "");
+      setEditedDescription(parsed.description || "");
       return parsed;
     }
     return {
+      name: "",
+      description: "",
       startDate: undefined,
       endDate: undefined,
       summaryData: {
@@ -75,6 +87,15 @@ const PayPeriod = () => {
   useEffect(() => {
     localStorage.setItem(`period_${id}`, JSON.stringify(periodData));
   }, [periodData, id]);
+
+  const handleSaveEdit = () => {
+    setPeriodData({
+      ...periodData,
+      name: editedName,
+      description: editedDescription,
+    });
+    setIsEditing(false);
+  };
 
   const calculateTotals = () => {
     const income = periodData.summaryData.income;
@@ -102,6 +123,63 @@ const PayPeriod = () => {
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Pay Periods
       </Button>
+
+      <div className="mb-6">
+        {isEditing ? (
+          <div className="space-y-4">
+            <div>
+              <Input
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                placeholder="Budget Name"
+                maxLength={50}
+              />
+            </div>
+            <div>
+              <Textarea
+                value={editedDescription}
+                onChange={(e) => setEditedDescription(e.target.value)}
+                placeholder="Budget Description"
+                maxLength={250}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={handleSaveEdit} size="sm">
+                <Check className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditedName(periodData.name);
+                  setEditedDescription(periodData.description);
+                }}
+                size="sm"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-bold">{periodData.name || "Untitled Budget"}</h1>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsEditing(true)}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </div>
+            {periodData.description && (
+              <p className="text-gray-500">{periodData.description}</p>
+            )}
+          </div>
+        )}
+      </div>
 
       <BudgetSection title="PAYCHECK PERIOD">
         <DateRangePicker

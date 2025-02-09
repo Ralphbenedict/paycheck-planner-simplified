@@ -2,14 +2,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Plus, UserPlus, LogIn, LogOut } from "lucide-react";
+import { Plus, UserPlus, LogIn, LogOut, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import SignUpForm from "@/components/SignUpForm";
 import LoginForm from "@/components/LoginForm";
+import CreateBudgetModal from "@/components/CreateBudgetModal";
 
 interface PayPeriod {
   id: string;
+  name: string;
+  description: string;
   startDate: Date | undefined;
   endDate: Date | undefined;
   createdAt: Date;
@@ -19,12 +22,17 @@ const PayPeriods = () => {
   const navigate = useNavigate();
   const [showSignUp, setShowSignUp] = React.useState(false);
   const [showLogin, setShowLogin] = React.useState(false);
+  const [showCreateModal, setShowCreateModal] = React.useState(false);
   const [user, setUser] = React.useState<{ fullName: string } | null>(null);
   const [periods, setPeriods] = React.useState<PayPeriod[]>(() => {
     const savedPeriods = localStorage.getItem("payPeriods");
     return savedPeriods
       ? JSON.parse(savedPeriods, (key, value) => {
-          if (key === "startDate" || key === "endDate" || key === "createdAt") {
+          if (
+            key === "startDate" ||
+            key === "endDate" ||
+            key === "createdAt"
+          ) {
             return value ? new Date(value) : undefined;
           }
           return value;
@@ -32,17 +40,25 @@ const PayPeriods = () => {
       : [];
   });
 
-  const createNewPeriod = () => {
+  const createNewPeriod = (data: {
+    name: string;
+    description: string;
+    startDate: Date | undefined;
+    endDate: Date | undefined;
+  }) => {
     const newPeriod: PayPeriod = {
       id: Math.random().toString(36).substr(2, 9),
-      startDate: undefined,
-      endDate: undefined,
+      name: data.name,
+      description: data.description,
+      startDate: data.startDate,
+      endDate: data.endDate,
       createdAt: new Date(),
     };
 
     const updatedPeriods = [...periods, newPeriod];
     setPeriods(updatedPeriods);
     localStorage.setItem("payPeriods", JSON.stringify(updatedPeriods));
+    setShowCreateModal(false);
     navigate(`/period/${newPeriod.id}`);
   };
 
@@ -79,7 +95,7 @@ const PayPeriods = () => {
               </Button>
             </>
           )}
-          <Button onClick={createNewPeriod}>
+          <Button onClick={() => setShowCreateModal(true)}>
             <Plus className="h-4 w-4 mr-2" />
             New Budget
           </Button>
@@ -93,14 +109,23 @@ const PayPeriods = () => {
           </div>
         ) : (
           periods.map((period) => (
-            <Link
+            <div
               key={period.id}
-              to={`/period/${period.id}`}
-              className="block p-4 rounded-lg border hover:border-primary transition-colors"
+              className="p-4 rounded-lg border hover:border-primary transition-colors"
             >
               <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-medium">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-medium">{period.name}</h3>
+                    <Link
+                      to={`/period/${period.id}`}
+                      className="text-muted-foreground hover:text-primary"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Link>
+                  </div>
+                  <p className="text-sm text-gray-500">{period.description}</p>
+                  <p className="text-sm text-gray-500 mt-1">
                     {period.startDate && period.endDate
                       ? `${format(period.startDate, "PPP")} - ${format(
                           period.endDate,
@@ -108,25 +133,32 @@ const PayPeriods = () => {
                         )}`
                       : "Dates not set"}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-xs text-gray-400 mt-1">
                     Created {format(period.createdAt, "PPP")}
                   </p>
                 </div>
-                <Button variant="ghost" size="sm">
-                  View Details →
-                </Button>
+                <Link to={`/period/${period.id}`}>
+                  <Button variant="ghost" size="sm">
+                    View Details →
+                  </Button>
+                </Link>
               </div>
-            </Link>
+            </div>
           ))
         )}
       </div>
 
-      <SignUpForm 
-        open={showSignUp} 
-        onOpenChange={setShowSignUp} 
+      <SignUpForm
+        open={showSignUp}
+        onOpenChange={setShowSignUp}
         onSignUpSuccess={handleSignUpSuccess}
       />
       <LoginForm open={showLogin} onOpenChange={setShowLogin} />
+      <CreateBudgetModal
+        open={showCreateModal}
+        onOpenChange={setShowCreateModal}
+        onSubmit={createNewPeriod}
+      />
     </div>
   );
 };
