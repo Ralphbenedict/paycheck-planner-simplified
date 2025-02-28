@@ -193,6 +193,7 @@ const PayPeriod = () => {
         )}
       </div>
 
+      {/* 1. DATE RANGE SECTION */}
       <BudgetSection title="PAYCHECK PERIOD" hideTitle>
         <DateRangePicker
           startDate={periodData.startDate}
@@ -206,41 +207,45 @@ const PayPeriod = () => {
         />
       </BudgetSection>
 
-      <BudgetSection title="SUMMARY">
-        <BudgetSummary
-          summaryData={periodData.summaryData}
-          setSummaryData={(newData) => {
-            setPeriodData(prev => ({
-              ...prev,
-              summaryData: typeof newData === 'function' ? newData(prev.summaryData) : newData
-            }));
-          }}
-          rollover={periodData.rollover}
-          setRollover={(checked: boolean) => 
-            setPeriodData(prev => ({ ...prev, rollover: checked }))
-          }
-        />
-      </BudgetSection>
-
+      {/* 2. BUDGET OVERVIEW SECTION */}
       <BudgetSection title="BUDGET OVERVIEW">
         <BudgetGraphs {...calculateTotals()} />
       </BudgetSection>
 
-      <BudgetSection title="CATEGORIES">
-        <Categories
-          categoryItems={periodData.categoryItems}
-          setCategoryItems={(newItems) =>
-            setPeriodData(prev => ({
-              ...prev,
-              categoryItems: typeof newItems === 'function' ? newItems(prev.categoryItems) : newItems
-            }))
-          }
-          availableCategories={Object.keys(periodData.summaryData).map(key => ({
-            key,
-            label: key.charAt(0).toUpperCase() + key.slice(1)
-          }))}
-        />
-      </BudgetSection>
+      {/* 3 & 4. SUMMARY AND CATEGORIES SECTIONS - SIDE BY SIDE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <BudgetSection title="SUMMARY">
+          <BudgetSummary
+            summaryData={periodData.summaryData}
+            setSummaryData={(newData) => {
+              setPeriodData(prev => ({
+                ...prev,
+                summaryData: typeof newData === 'function' ? newData(prev.summaryData) : newData
+              }));
+            }}
+            rollover={periodData.rollover}
+            setRollover={(checked: boolean) => 
+              setPeriodData(prev => ({ ...prev, rollover: checked }))
+            }
+          />
+        </BudgetSection>
+
+        <BudgetSection title="CATEGORIES">
+          <Categories
+            categoryItems={periodData.categoryItems}
+            setCategoryItems={(newItems) =>
+              setPeriodData(prev => ({
+                ...prev,
+                categoryItems: typeof newItems === 'function' ? newItems(prev.categoryItems) : newItems
+              }))
+            }
+            availableCategories={Object.keys(periodData.summaryData).map(key => ({
+              key,
+              label: key.charAt(0).toUpperCase() + key.slice(1)
+            }))}
+          />
+        </BudgetSection>
+      </div>
     </div>
   );
 };
