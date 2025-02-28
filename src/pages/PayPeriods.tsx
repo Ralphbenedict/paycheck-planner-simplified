@@ -29,6 +29,7 @@ interface PayPeriod {
   startDate: Date | undefined;  // When this budget period begins
   endDate: Date | undefined;    // When this budget period ends
   createdAt: Date;     // Timestamp of when this budget was created
+  collaborators?: { email: string; fullName?: string }[]; // People who can access this budget
 }
 
 // Define the structure for individual budget items within categories
@@ -100,8 +101,9 @@ const PayPeriods = () => {
   const createNewPeriod = (data: {
     name: string;
     description: string;
-    startDate: Date | undefined;
-    endDate: Date | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    collaborators?: { email: string; fullName?: string }[];
   }) => {
     if (periodToEdit) {
       // Update existing budget logic
@@ -126,6 +128,7 @@ const PayPeriods = () => {
         startDate: data.startDate,
         endDate: data.endDate,
         createdAt: new Date(),
+        collaborators: data.collaborators || [],
       };
 
       const updatedPeriods = [...periods, newPeriod];
@@ -144,6 +147,7 @@ const PayPeriods = () => {
           return acc;
         }, {} as CategoryItems),
         rollover: false,
+        collaborators: data.collaborators || [],
       }));
       
       // Navigate to the new budget's detail page
@@ -267,6 +271,19 @@ const PayPeriods = () => {
                   <p className="text-xs text-gray-400 mt-1">
                     Created {format(period.createdAt, "PPP")}
                   </p>
+                  {/* Display collaborators if any */}
+                  {period.collaborators && period.collaborators.length > 0 && (
+                    <div className="flex items-center gap-1 mt-2">
+                      <span className="text-xs text-gray-500">Collaborators:</span>
+                      <div className="flex flex-wrap gap-1">
+                        {period.collaborators.map((collaborator) => (
+                          <span key={collaborator.email} className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
+                            {collaborator.fullName || collaborator.email}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 {/* Action buttons for editing and deleting budgets */}
                 <div className="flex items-center gap-2">
