@@ -36,18 +36,19 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
     ];
 
     return (
-      <div className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm">
-        <h3 className="text-lg font-semibold mb-4 text-[#1A1F2C]">{title}</h3>
-        <div className="relative w-48 h-48">
+      <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-sm">
+        <h3 className="text-xl font-semibold mb-5 text-[#1A1F2C]">{title}</h3>
+        <div className="relative w-64 h-64">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
                 data={data}
-                innerRadius={60}
-                outerRadius={70}
+                innerRadius={70}
+                outerRadius={90}
                 startAngle={90}
                 endAngle={-270}
                 dataKey="value"
+                strokeWidth={0}
               >
                 <Cell fill={color} />
                 <Cell fill={remainingColor} />
@@ -55,14 +56,14 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xl font-bold text-[#222222]">
+            <span className="text-2xl font-bold text-[#222222]">
               {getCurrencySymbol()}{amount.toLocaleString('en-US', { 
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
                 useGrouping: true
               })}
             </span>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 mt-2">
               {title.toLowerCase()}
             </span>
           </div>
@@ -100,9 +101,9 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
         </Select>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8 relative">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-12 relative">
         {renderGraph("LEFT TO BUDGET", convertedLeftToBudget, budgetPercentage, "#1EAEDB", "#FDE1D3")}
-        <div className="hidden md:block absolute left-1/2 top-8 bottom-8 -translate-x-1/2">
+        <div className="hidden md:block absolute left-1/2 top-12 bottom-12 -translate-x-1/2">
           <Separator orientation="vertical" />
         </div>
         {renderGraph("LEFT TO SPEND", convertedLeftToSpend, spendPercentage, "#F97316", "#D3E4FD")}
