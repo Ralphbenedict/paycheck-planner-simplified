@@ -23,6 +23,13 @@ const CONVERSION_RATES = {
   GBP: 0.78,
   JPY: 150.42,
   CAD: 1.36,
+  // Southeast Asian currencies
+  PHP: 56.20,    // Philippine Peso
+  SGD: 1.35,     // Singapore Dollar
+  MYR: 4.48,     // Malaysian Ringgit
+  THB: 35.80,    // Thai Baht
+  IDR: 15750,    // Indonesian Rupiah
+  VND: 25150,    // Vietnamese Dong
 };
 
 type CurrencyCode = keyof typeof CONVERSION_RATES;
@@ -33,6 +40,13 @@ const CURRENCY_SYMBOLS = {
   GBP: "£",
   JPY: "¥",
   CAD: "C$",
+  // Southeast Asian currency symbols
+  PHP: "₱",
+  SGD: "S$",
+  MYR: "RM",
+  THB: "฿",
+  IDR: "Rp",
+  VND: "₫",
 };
 
 const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsProps) => {
@@ -104,11 +118,20 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
             <SelectValue placeholder="Select currency" />
           </SelectTrigger>
           <SelectContent>
+            {/* North American & European currencies */}
             <SelectItem value="USD">USD ($)</SelectItem>
             <SelectItem value="EUR">EUR (€)</SelectItem>
             <SelectItem value="GBP">GBP (£)</SelectItem>
-            <SelectItem value="JPY">JPY (¥)</SelectItem>
             <SelectItem value="CAD">CAD (C$)</SelectItem>
+            <SelectItem value="JPY">JPY (¥)</SelectItem>
+            
+            {/* Southeast Asian currencies */}
+            <SelectItem value="PHP">PHP (₱)</SelectItem>
+            <SelectItem value="SGD">SGD (S$)</SelectItem>
+            <SelectItem value="MYR">MYR (RM)</SelectItem>
+            <SelectItem value="THB">THB (฿)</SelectItem>
+            <SelectItem value="IDR">IDR (Rp)</SelectItem>
+            <SelectItem value="VND">VND (₫)</SelectItem>
           </SelectContent>
         </Select>
       </div>
