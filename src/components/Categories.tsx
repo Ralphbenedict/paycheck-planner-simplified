@@ -135,7 +135,7 @@ const Categories = ({
             <TabsTrigger 
               key={key} 
               value={key}
-              className="flex-shrink-0 min-w-24"
+              className="flex-shrink-0 min-w-fit px-4" // Changed to min-w-fit with explicit padding
             >
               {label}
             </TabsTrigger>
