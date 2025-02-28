@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CategoryTab from "./CategoryTab";
@@ -47,21 +48,27 @@ const Categories = ({
     }));
   };
 
-  // Check scroll overflow
-  useEffect(() => {
-    const checkScrollOverflow = () => {
-      if (tabsListRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
-        setShowLeftArrow(scrollLeft > 0);
-        setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 5); // Small buffer
-      }
-    };
+  // Check scroll overflow and update arrow visibility
+  const checkScrollOverflow = () => {
+    if (tabsListRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 5); // Small buffer
+    }
+  };
 
+  // Initialize scroll check
+  useEffect(() => {
     checkScrollOverflow();
     // Add resize listener to recheck when window size changes
     window.addEventListener('resize', checkScrollOverflow);
     return () => window.removeEventListener('resize', checkScrollOverflow);
-  }, [scrollPosition, categories]);
+  }, []);
+
+  // Update arrows when scroll position changes
+  useEffect(() => {
+    checkScrollOverflow();
+  }, [scrollPosition]);
 
   // Scroll handlers
   const scrollLeft = () => {
