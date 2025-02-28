@@ -47,15 +47,11 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
 
-  // Convert an amount from USD to the selected currency
+  // Convert an amount to the selected currency
+  // This assumes all initial values are stored in USD internally
   const convertAmount = (amount: number): number => {
-    // If the currency is USD, no conversion needed
-    if (currency === "USD") {
-      return amount;
-    }
-    
-    // The input amount is already in the selected currency, so we don't need to convert it
-    return amount;
+    // Convert the amount from USD to the target currency
+    return amount * CONVERSION_RATES[currency];
   };
 
   // Get the currency symbol for the current selected currency
