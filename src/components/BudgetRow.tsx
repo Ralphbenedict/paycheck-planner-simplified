@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,12 @@ const BudgetRow = ({
   const [budgetInput, setBudgetInput] = useState(budgetValue.toString());
   const [actualInput, setActualInput] = useState(actualValue.toString());
 
+  // Update local state when prop values change
+  useEffect(() => {
+    setBudgetInput(budgetValue.toString());
+    setActualInput(actualValue.toString());
+  }, [budgetValue, actualValue]);
+
   const handleInputBlur = (value: string, onChange: (value: number) => void) => {
     const numericValue = parseFloat(value) || 0;
     onChange(numericValue);
@@ -42,6 +48,13 @@ const BudgetRow = ({
     // Allow empty string, numbers, and a single decimal point
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
       setInput(value);
+    }
+  };
+
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    // Clear the field if it's "0"
+    if (e.target.value === "0") {
+      e.target.value = "";
     }
   };
 
@@ -103,6 +116,7 @@ const BudgetRow = ({
           type="text"
           value={budgetInput}
           onChange={(e) => handleInputChange(e.target.value, setBudgetInput)}
+          onFocus={handleFocus}
           onBlur={() => handleInputBlur(budgetInput, onBudgetChange)}
           className={cn("text-right pl-6", {
             "font-semibold": label === "TOTAL",
@@ -118,6 +132,7 @@ const BudgetRow = ({
           type="text"
           value={actualInput}
           onChange={(e) => handleInputChange(e.target.value, setActualInput)}
+          onFocus={handleFocus}
           onBlur={() => handleInputBlur(actualInput, onActualChange)}
           className={cn("text-right pl-6", {
             "font-semibold": label === "TOTAL",

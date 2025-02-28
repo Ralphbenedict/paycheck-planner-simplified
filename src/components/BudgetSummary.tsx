@@ -69,8 +69,8 @@ const BudgetSummary = ({
 
       {/* Budget rows for each category */}
       {Object.entries(summaryData).map(([key, value]) => (
-        <div key={key} className="flex items-center gap-2">
-          <div className="flex-1">
+        <div key={key} className="grid grid-cols-12 gap-4 items-center">
+          <div className="col-span-10">
             <BudgetRow
               label={key.toUpperCase()}
               budgetValue={value.budget}
@@ -97,19 +97,21 @@ const BudgetSummary = ({
             />
           </div>
           {/* Allow deletion of custom categories */}
-          {key !== 'rollover' && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                const { [key]: removed, ...rest } = summaryData;
-                setSummaryData(rest);
-              }}
-              className="h-8 w-8"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          )}
+          <div className="col-span-2 flex justify-end">
+            {key !== 'rollover' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  const { [key]: removed, ...rest } = summaryData;
+                  setSummaryData(rest);
+                }}
+                className="h-8 w-8"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       ))}
 
@@ -164,4 +166,3 @@ const BudgetSummary = ({
 };
 
 export default BudgetSummary;
-

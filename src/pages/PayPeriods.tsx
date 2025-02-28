@@ -195,38 +195,44 @@ const PayPeriods = () => {
   return (
     <div className="container py-8 max-w-4xl">
       {/* Header section with title and user actions */}
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-bold">My Budgets</h1>
-        <div className="flex gap-2 items-center">
-          {/* Show different buttons based on user authentication status */}
-          {!user ? (
-            <>
-              <Button variant="outline" onClick={() => setShowSignUp(true)}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Sign Up
-              </Button>
-              <Button variant="outline" onClick={() => setShowLogin(true)}>
-                <LogIn className="h-4 w-4 mr-2" />
-                Login
-              </Button>
-            </>
-          ) : (
-            <>
-              <span className="text-sm mr-4">Hi, {user.fullName}!</span>
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </>
-          )}
-          <Button onClick={() => {
+      <div className="flex flex-col mb-8">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">My Budgets</h1>
+          <div className="flex gap-2 items-center">
+            {/* Show different buttons based on user authentication status */}
+            {!user ? (
+              <>
+                <Button variant="outline" onClick={() => setShowSignUp(true)}>
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Sign Up
+                </Button>
+                <Button variant="outline" onClick={() => setShowLogin(true)}>
+                  <LogIn className="h-4 w-4 mr-2" />
+                  Login
+                </Button>
+              </>
+            ) : (
+              <>
+                <span className="text-sm mr-4">Hi, {user.fullName}!</span>
+                <Button variant="outline" onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+        {/* New Budget button moved below the title */}
+        <Button 
+          onClick={() => {
             setPeriodToEdit(null);
             setShowCreateModal(true);
-          }}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Budget
-          </Button>
-        </div>
+          }}
+          className="self-start"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          New Budget
+        </Button>
       </div>
 
       {/* List of budget periods */}
@@ -330,4 +336,3 @@ const PayPeriods = () => {
 };
 
 export default PayPeriods;
-
