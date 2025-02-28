@@ -40,8 +40,12 @@ const Categories = ({
         key,
         label: key.charAt(0).toUpperCase() + key.slice(1)
       }));
+  
+  // Filter out "rollover" from the displayed categories
+  const displayCategories = categories.filter(({ key }) => key !== 'rollover');
 
-  const [activeCategory, setActiveCategory] = useState(categories[0]?.key || "");
+  // Set the initial active category to the first non-rollover category
+  const [activeCategory, setActiveCategory] = useState(displayCategories[0]?.key || "");
 
   const handleItemsChange = (category: string, newItems: CategoryItem[]) => {
     setCategoryItems(prev => ({
@@ -51,11 +55,11 @@ const Categories = ({
   };
 
   // Only render if we have categories
-  if (categories.length === 0) {
+  if (displayCategories.length === 0) {
     return null;
   }
 
-  const activeLabel = categories.find(cat => cat.key === activeCategory)?.label || "";
+  const activeLabel = displayCategories.find(cat => cat.key === activeCategory)?.label || "";
 
   return (
     <div className="w-full space-y-4">
@@ -65,7 +69,7 @@ const Categories = ({
             <SelectValue placeholder={activeLabel || "Select category"} />
           </SelectTrigger>
           <SelectContent>
-            {categories.map(({ key, label }) => (
+            {displayCategories.map(({ key, label }) => (
               <SelectItem key={key} value={key}>
                 {label}
               </SelectItem>
