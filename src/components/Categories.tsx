@@ -127,7 +127,7 @@ const Categories = ({
         {/* Tabs list with overflow */}
         <TabsList 
           ref={tabsListRef}
-          className="flex w-full overflow-x-hidden mx-auto px-8"
+          className="flex w-full overflow-x-hidden mx-auto px-10" // Increased padding for arrow space
           style={{ scrollbarWidth: 'none' }}
           onScroll={handleScroll}
         >
@@ -135,7 +135,7 @@ const Categories = ({
             <TabsTrigger 
               key={key} 
               value={key}
-              className="flex-shrink-0 min-w-fit px-4" // Changed to min-w-fit with explicit padding
+              className="flex-shrink-0 whitespace-nowrap px-3" // Fixed width with whitespace-nowrap
             >
               {label}
             </TabsTrigger>
