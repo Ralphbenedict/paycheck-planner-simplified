@@ -1,9 +1,15 @@
 
-import React, { useRef, useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import React, { useState } from "react";
 import CategoryTab from "./CategoryTab";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "./ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CategoryItem {
   id: string;
@@ -35,11 +41,7 @@ const Categories = ({
         label: key.charAt(0).toUpperCase() + key.slice(1)
       }));
 
-  const tabsListRef = useRef<HTMLDivElement>(null);
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(true);
-  const [activeTab, setActiveTab] = useState(categories[0]?.key || "");
+  const [activeCategory, setActiveCategory] = useState(categories[0]?.key || "");
 
   const handleItemsChange = (category: string, newItems: CategoryItem[]) => {
     setCategoryItems(prev => ({
@@ -48,124 +50,45 @@ const Categories = ({
     }));
   };
 
-  // Check scroll overflow and update arrow visibility
-  const checkScrollOverflow = () => {
-    if (tabsListRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
-      setShowLeftArrow(scrollLeft > 0);
-      setShowRightArrow(scrollLeft + clientWidth < scrollWidth - 5); // Small buffer
-    }
-  };
-
-  // Initialize scroll check
-  useEffect(() => {
-    checkScrollOverflow();
-    // Add resize listener to recheck when window size changes
-    window.addEventListener('resize', checkScrollOverflow);
-    return () => window.removeEventListener('resize', checkScrollOverflow);
-  }, []);
-
-  // Update arrows when scroll position changes
-  useEffect(() => {
-    checkScrollOverflow();
-  }, [scrollPosition]);
-
-  // Scroll handlers
-  const scrollLeft = () => {
-    if (tabsListRef.current) {
-      const scrollAmount = tabsListRef.current.clientWidth / 3;
-      tabsListRef.current.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      // Update scroll position after animation
-      setTimeout(() => {
-        if (tabsListRef.current) {
-          setScrollPosition(tabsListRef.current.scrollLeft);
-        }
-      }, 300);
-    }
-  };
-
-  const scrollRight = () => {
-    if (tabsListRef.current) {
-      const scrollAmount = tabsListRef.current.clientWidth / 3;
-      tabsListRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      // Update scroll position after animation
-      setTimeout(() => {
-        if (tabsListRef.current) {
-          setScrollPosition(tabsListRef.current.scrollLeft);
-        }
-      }, 300);
-    }
-  };
-
-  // Handle scroll event
-  const handleScroll = () => {
-    if (tabsListRef.current) {
-      setScrollPosition(tabsListRef.current.scrollLeft);
-    }
-  };
-
   // Only render if we have categories
   if (categories.length === 0) {
     return null;
   }
 
-  return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <div className="relative">
-        {/* Left scroll button */}
-        {showLeftArrow && (
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background shadow-md"
-            onClick={scrollLeft}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-        )}
-        
-        {/* Tabs list with overflow */}
-        <TabsList 
-          ref={tabsListRef}
-          className="flex w-full overflow-x-hidden mx-auto px-10" // Increased padding for arrow space
-          style={{ scrollbarWidth: 'none' }}
-          onScroll={handleScroll}
-        >
-          {categories.map(({ key, label }) => (
-            <TabsTrigger 
-              key={key} 
-              value={key}
-              className="flex-shrink-0 whitespace-nowrap px-3" // Fixed width with whitespace-nowrap
-            >
-              {label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+  const activeLabel = categories.find(cat => cat.key === activeCategory)?.label || "";
 
-        {/* Right scroll button */}
-        {showRightArrow && (
-          <Button 
-            variant="outline" 
-            size="icon" 
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-background shadow-md"
-            onClick={scrollRight}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        )}
+  return (
+    <div className="w-full space-y-4">
+      <div className="flex justify-end">
+        <Select value={activeCategory} onValueChange={setActiveCategory}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={activeLabel || "Select category"} />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map(({ key, label }) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Tab content - remains the same */}
-      {categories.map(({ key, label }) => (
-        <TabsContent key={key} value={key}>
-          <CategoryTab
-            title={label}
-            items={categoryItems[key] || []}
-            onItemsChange={(newItems) => handleItemsChange(key, newItems)}
-          />
-        </TabsContent>
-      ))}
-    </Tabs>
+      {/* Display the active category */}
+      <div className="pt-2">
+        {categories
+          .filter(({ key }) => key === activeCategory)
+          .map(({ key, label }) => (
+            <div key={key}>
+              <CategoryTab
+                title={label}
+                items={categoryItems[key] || []}
+                onItemsChange={(newItems) => handleItemsChange(key, newItems)}
+              />
+            </div>
+          ))}
+      </div>
+    </div>
   );
 };
 
