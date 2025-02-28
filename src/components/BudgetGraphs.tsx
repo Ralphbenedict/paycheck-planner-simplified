@@ -1,8 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { DollarSign } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BudgetGraphsProps {
   totalIncome: number;
@@ -10,11 +16,40 @@ interface BudgetGraphsProps {
   totalActual: number;
 }
 
+// Currency conversion rates (fixed rates for demonstration)
+const CONVERSION_RATES = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.78,
+  JPY: 150.42,
+  CAD: 1.36,
+};
+
+type CurrencyCode = keyof typeof CONVERSION_RATES;
+
+const CURRENCY_SYMBOLS = {
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  JPY: "¥",
+  CAD: "C$",
+};
+
 const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsProps) => {
+  const [currency, setCurrency] = useState<CurrencyCode>("USD");
+  
+  const convertAmount = (amount: number): number => {
+    return amount / CONVERSION_RATES[currency];
+  };
+
   const leftToBudget = Math.max(0, totalIncome - totalBudgeted);
   const leftToSpend = Math.max(0, totalBudgeted - totalActual);
   const budgetPercentage = totalIncome > 0 ? (leftToBudget / totalIncome) * 100 : 0;
   const spendPercentage = totalBudgeted > 0 ? (leftToSpend / totalBudgeted) * 100 : 0;
+
+  // Convert amounts based on selected currency
+  const convertedLeftToBudget = convertAmount(leftToBudget);
+  const convertedLeftToSpend = convertAmount(leftToSpend);
 
   const renderGraph = (title: string, amount: number, percentage: number, color: string, remainingColor: string) => {
     const data = [
@@ -42,9 +77,8 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <DollarSign className="w-5 h-5 mb-1 text-gray-600" />
             <span className="text-xl font-bold text-[#222222]">
-              {amount.toLocaleString('en-US', { 
+              {CURRENCY_SYMBOLS[currency]}{amount.toLocaleString('en-US', { 
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
                 useGrouping: true
@@ -60,12 +94,32 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8 relative">
-      {renderGraph("LEFT TO BUDGET", leftToBudget, budgetPercentage, "#1EAEDB", "#FDE1D3")}
-      <div className="hidden md:block absolute left-1/2 top-8 bottom-8 -translate-x-1/2">
-        <Separator orientation="vertical" />
+    <div className="space-y-4">
+      <div className="flex justify-end mb-2">
+        <Select 
+          value={currency} 
+          onValueChange={(value) => setCurrency(value as CurrencyCode)}
+        >
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Select currency" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="USD">USD ($)</SelectItem>
+            <SelectItem value="EUR">EUR (€)</SelectItem>
+            <SelectItem value="GBP">GBP (£)</SelectItem>
+            <SelectItem value="JPY">JPY (¥)</SelectItem>
+            <SelectItem value="CAD">CAD (C$)</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-      {renderGraph("LEFT TO SPEND", leftToSpend, spendPercentage, "#F97316", "#D3E4FD")}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-8 relative">
+        {renderGraph("LEFT TO BUDGET", convertedLeftToBudget, budgetPercentage, "#1EAEDB", "#FDE1D3")}
+        <div className="hidden md:block absolute left-1/2 top-8 bottom-8 -translate-x-1/2">
+          <Separator orientation="vertical" />
+        </div>
+        {renderGraph("LEFT TO SPEND", convertedLeftToSpend, spendPercentage, "#F97316", "#D3E4FD")}
+      </div>
     </div>
   );
 };
