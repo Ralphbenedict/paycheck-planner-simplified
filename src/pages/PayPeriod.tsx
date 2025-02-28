@@ -133,7 +133,7 @@ const PayPeriod = () => {
         className="mb-6"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Pay Periods
+        Back to Home
       </Button>
 
       <div className="mb-6">

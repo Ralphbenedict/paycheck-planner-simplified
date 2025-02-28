@@ -62,15 +62,14 @@ const BudgetSummary = ({
       {/* Column headers */}
       <div className="grid grid-cols-12 gap-4 mb-4">
         <div className="col-span-4"></div>
-        <h3 className="col-span-3 text-right font-semibold">BUDGET</h3>
-        <h3 className="col-span-3 text-right font-semibold">ACTUAL</h3>
-        <div className="col-span-2"></div>
+        <h3 className="col-span-4 text-right font-semibold pr-3">BUDGET</h3>
+        <h3 className="col-span-4 text-right font-semibold pr-3">ACTUAL</h3>
       </div>
 
       {/* Budget rows for each category */}
       {Object.entries(summaryData).map(([key, value]) => (
-        <div key={key} className="grid grid-cols-12 gap-4 items-center">
-          <div className="col-span-10">
+        <div key={key} className="flex items-center gap-2">
+          <div className="flex-grow">
             <BudgetRow
               label={key.toUpperCase()}
               budgetValue={value.budget}
@@ -97,21 +96,23 @@ const BudgetSummary = ({
             />
           </div>
           {/* Allow deletion of custom categories */}
-          <div className="col-span-2 flex justify-end">
-            {key !== 'rollover' && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  const { [key]: removed, ...rest } = summaryData;
-                  setSummaryData(rest);
-                }}
-                className="h-8 w-8"
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          {key !== 'rollover' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const { [key]: removed, ...rest } = summaryData;
+                setSummaryData(rest);
+              }}
+              className="h-8 w-8 ml-1 flex-shrink-0"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          )}
+          {/* Add an empty div with the same width as the button to maintain alignment */}
+          {key === 'rollover' && (
+            <div className="w-8 h-8 ml-1 flex-shrink-0"></div>
+          )}
         </div>
       ))}
 
