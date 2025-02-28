@@ -95,24 +95,22 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
                 <h3 className="font-semibold">BALANCE</h3>
               </div>
               <div className="col-span-4">
-                <div className="bg-gray-50 rounded-md">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <div className="bg-gray-50 rounded-md relative">
                   <input
                     type="text"
-                    value={totalBudget.toFixed(2)}
+                    value={`$${totalBudget.toFixed(2)}`}
                     readOnly
-                    className="w-full px-6 py-2 text-right bg-transparent font-semibold"
+                    className="w-full px-3 py-2 text-right bg-transparent font-semibold"
                   />
                 </div>
               </div>
               <div className="col-span-4">
-                <div className="bg-gray-50 rounded-md">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                <div className="bg-gray-50 rounded-md relative">
                   <input
                     type="text"
-                    value={totalActual.toFixed(2)}
+                    value={`$${totalActual.toFixed(2)}`}
                     readOnly
-                    className="w-full px-6 py-2 text-right bg-transparent font-semibold"
+                    className="w-full px-3 py-2 text-right bg-transparent font-semibold"
                   />
                 </div>
               </div>
