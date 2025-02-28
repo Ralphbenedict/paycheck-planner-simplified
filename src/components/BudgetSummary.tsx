@@ -69,6 +69,42 @@ const BudgetSummary = ({
           <h3>ACTUAL</h3>
         </div>
       </div>
+      
+      {/* Add New Item button - MOVED HERE */}
+      {isAddingNew ? (
+        <div className="flex items-center gap-2 mb-4">
+          <Input
+            value={newItemLabel}
+            onChange={(e) => setNewItemLabel(e.target.value)}
+            placeholder="Enter item name"
+            className="flex-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleAddNewItem();
+              if (e.key === 'Escape') setIsAddingNew(false);
+            }}
+          />
+          <Button onClick={handleAddNewItem} size="sm">Add</Button>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={() => {
+              setIsAddingNew(false);
+              setNewItemLabel("");
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsAddingNew(true)}
+          className="mb-4"
+        >
+          <Plus className="h-4 w-4 mr-2" /> Add New Item
+        </Button>
+      )}
 
       {/* Budget rows for each category */}
       {Object.entries(summaryData).map(([key, value]) => (
@@ -119,42 +155,6 @@ const BudgetSummary = ({
           )}
         </div>
       ))}
-
-      {/* UI for adding new budget categories */}
-      {isAddingNew ? (
-        <div className="flex items-center gap-2">
-          <Input
-            value={newItemLabel}
-            onChange={(e) => setNewItemLabel(e.target.value)}
-            placeholder="Enter item name"
-            className="flex-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleAddNewItem();
-              if (e.key === 'Escape') setIsAddingNew(false);
-            }}
-          />
-          <Button onClick={handleAddNewItem} size="sm">Add</Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => {
-              setIsAddingNew(false);
-              setNewItemLabel("");
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
-      ) : (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsAddingNew(true)}
-          className="mt-2"
-        >
-          <Plus className="h-4 w-4 mr-2" /> Add New Item
-        </Button>
-      )}
 
       {/* Total summary row */}
       <div className="border-t pt-4">
