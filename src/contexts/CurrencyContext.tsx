@@ -49,7 +49,13 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   // Convert an amount from USD to the selected currency
   const convertAmount = (amount: number): number => {
-    return amount / CONVERSION_RATES[currency];
+    // If the currency is USD, no conversion needed
+    if (currency === "USD") {
+      return amount;
+    }
+    
+    // The input amount is already in the selected currency, so we don't need to convert it
+    return amount;
   };
 
   // Get the currency symbol for the current selected currency
