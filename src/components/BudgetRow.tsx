@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface BudgetRowProps {
   label: string;
@@ -27,6 +28,7 @@ const BudgetRow = ({
   onCheckChange,
   index = 0,
 }: BudgetRowProps) => {
+  const { getCurrencySymbol, convertAmount } = useCurrency();
   const [budgetInput, setBudgetInput] = useState(budgetValue.toString());
   const [actualInput, setActualInput] = useState(actualValue.toString());
 
@@ -94,6 +96,7 @@ const BudgetRow = ({
   };
 
   const styles = getRowStyles();
+  const currencySymbol = getCurrencySymbol();
 
   return (
     <div className={styles.row}>
@@ -110,7 +113,7 @@ const BudgetRow = ({
       </div>
       <div className={cn("col-span-4", styles.budget)}>
         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-          $
+          {currencySymbol}
         </span>
         <Input
           type="text"
@@ -126,7 +129,7 @@ const BudgetRow = ({
       </div>
       <div className={cn("col-span-4", styles.actual)}>
         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-          $
+          {currencySymbol}
         </span>
         <Input
           type="text"

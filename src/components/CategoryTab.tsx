@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import BudgetRow from "./BudgetRow";
 import { Button } from "./ui/button";
 import { Plus, Trash2 } from "lucide-react";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface CategoryItem {
   id: string;
@@ -18,6 +19,8 @@ interface CategoryTabProps {
 }
 
 const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
+  const { getCurrencySymbol, convertAmount } = useCurrency();
+  
   const addItem = () => {
     const newItem: CategoryItem = {
       id: Math.random().toString(36).substr(2, 9),
@@ -42,6 +45,7 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
 
   const totalBudget = items.reduce((sum, item) => sum + item.budget, 0);
   const totalActual = items.reduce((sum, item) => sum + item.actual, 0);
+  const currencySymbol = getCurrencySymbol();
 
   return (
     <div className="space-y-4">
@@ -98,7 +102,7 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
                 <div className="bg-gray-50 rounded-md relative">
                   <input
                     type="text"
-                    value={`$${totalBudget.toFixed(2)}`}
+                    value={`${currencySymbol}${totalBudget.toFixed(2)}`}
                     readOnly
                     className="w-full px-3 py-2 text-right bg-transparent font-semibold"
                   />
@@ -108,7 +112,7 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
                 <div className="bg-gray-50 rounded-md relative">
                   <input
                     type="text"
-                    value={`$${totalActual.toFixed(2)}`}
+                    value={`${currencySymbol}${totalActual.toFixed(2)}`}
                     readOnly
                     className="w-full px-3 py-2 text-right bg-transparent font-semibold"
                   />

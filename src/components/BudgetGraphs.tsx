@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useCurrency, CurrencyCode, CURRENCY_SYMBOLS } from "@/contexts/CurrencyContext";
 
 interface BudgetGraphsProps {
   totalIncome: number;
@@ -16,45 +17,8 @@ interface BudgetGraphsProps {
   totalActual: number;
 }
 
-// Currency conversion rates (fixed rates for demonstration)
-const CONVERSION_RATES = {
-  USD: 1,
-  EUR: 0.92,
-  GBP: 0.78,
-  JPY: 150.42,
-  CAD: 1.36,
-  // Southeast Asian currencies
-  PHP: 56.20,    // Philippine Peso
-  SGD: 1.35,     // Singapore Dollar
-  MYR: 4.48,     // Malaysian Ringgit
-  THB: 35.80,    // Thai Baht
-  IDR: 15750,    // Indonesian Rupiah
-  VND: 25150,    // Vietnamese Dong
-};
-
-type CurrencyCode = keyof typeof CONVERSION_RATES;
-
-const CURRENCY_SYMBOLS = {
-  USD: "$",
-  EUR: "€",
-  GBP: "£",
-  JPY: "¥",
-  CAD: "C$",
-  // Southeast Asian currency symbols
-  PHP: "₱",
-  SGD: "S$",
-  MYR: "RM",
-  THB: "฿",
-  IDR: "Rp",
-  VND: "₫",
-};
-
 const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsProps) => {
-  const [currency, setCurrency] = useState<CurrencyCode>("USD");
-  
-  const convertAmount = (amount: number): number => {
-    return amount / CONVERSION_RATES[currency];
-  };
+  const { currency, setCurrency, convertAmount, getCurrencySymbol } = useCurrency();
 
   const leftToBudget = Math.max(0, totalIncome - totalBudgeted);
   const leftToSpend = Math.max(0, totalBudgeted - totalActual);
@@ -92,7 +56,7 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-xl font-bold text-[#222222]">
-              {CURRENCY_SYMBOLS[currency]}{amount.toLocaleString('en-US', { 
+              {getCurrencySymbol()}{amount.toLocaleString('en-US', { 
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
                 useGrouping: true
