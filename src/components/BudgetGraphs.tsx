@@ -1,4 +1,3 @@
-
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Separator } from "@/components/ui/separator";
@@ -22,17 +21,22 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
 
   const leftToBudget = Math.max(0, totalIncome - totalBudgeted);
   const leftToSpend = Math.max(0, totalBudgeted - totalActual);
-  const budgetPercentage = totalIncome > 0 ? (leftToBudget / totalIncome) * 100 : 0;
-  const spendPercentage = totalBudgeted > 0 ? (leftToSpend / totalBudgeted) * 100 : 0;
 
-  // Convert amounts based on selected currency
+  const budgetPercentage = totalIncome > 0 
+    ? Math.min(100, Math.round((leftToBudget / totalIncome) * 100)) 
+    : 0;
+    
+  const spendPercentage = totalBudgeted > 0 
+    ? Math.min(100, Math.round((leftToSpend / totalBudgeted) * 100)) 
+    : 0;
+
   const convertedLeftToBudget = convertAmount(leftToBudget);
   const convertedLeftToSpend = convertAmount(leftToSpend);
 
   const renderGraph = (title: string, amount: number, percentage: number, color: string, remainingColor: string) => {
     const data = [
-      { value: percentage },
       { value: 100 - percentage },
+      { value: percentage },
     ];
 
     return (
@@ -50,8 +54,8 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
                 dataKey="value"
                 strokeWidth={0}
               >
-                <Cell fill={color} />
                 <Cell fill={remainingColor} />
+                <Cell fill={color} />
               </Pie>
             </PieChart>
           </ResponsiveContainer>
@@ -83,14 +87,12 @@ const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsP
             <SelectValue placeholder="Select currency" />
           </SelectTrigger>
           <SelectContent>
-            {/* North American & European currencies */}
             <SelectItem value="USD">USD ($)</SelectItem>
             <SelectItem value="EUR">EUR (€)</SelectItem>
             <SelectItem value="GBP">GBP (£)</SelectItem>
             <SelectItem value="CAD">CAD (C$)</SelectItem>
             <SelectItem value="JPY">JPY (¥)</SelectItem>
             
-            {/* Southeast Asian currencies */}
             <SelectItem value="PHP">PHP (₱)</SelectItem>
             <SelectItem value="SGD">SGD (S$)</SelectItem>
             <SelectItem value="MYR">MYR (RM)</SelectItem>
