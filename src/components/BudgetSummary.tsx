@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import BudgetRow from "./BudgetRow";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -17,6 +16,7 @@ interface BudgetSummaryProps {
   setSummaryData: React.Dispatch<React.SetStateAction<SummaryData>>;  // Update handler
   rollover: boolean;            // Whether to include previous period's balance
   setRollover: (value: boolean) => void;  // Toggle rollover setting
+  onTotalChange?: (total: number) => void; // Callback to notify parent of total change
 }
 
 const BudgetSummary = ({
@@ -24,6 +24,7 @@ const BudgetSummary = ({
   setSummaryData,
   rollover,
   setRollover,
+  onTotalChange,
 }: BudgetSummaryProps) => {
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -62,6 +63,14 @@ const BudgetSummary = ({
       };
     }, { budget: 0, actual: 0 });
   };
+
+  // Notify parent component when total changes
+  useEffect(() => {
+    const total = calculateTotal();
+    if (onTotalChange) {
+      onTotalChange(total.budget);
+    }
+  }, [summaryData, rollover]);
 
   // Handler for adding new budget item with allocations
   const handleAddBudgetItem = (item: { 

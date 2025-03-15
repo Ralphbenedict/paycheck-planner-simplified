@@ -50,6 +50,7 @@ const PayPeriod = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
+  const [totalSavings, setTotalSavings] = useState(0); // Add state to track total savings
   const [periodData, setPeriodData] = useState<PeriodData>(() => {
     const savedData = localStorage.getItem(`period_${id}`);
     if (savedData) {
@@ -116,6 +117,13 @@ const PayPeriod = () => {
 
     return { totalIncome, totalBudgeted, totalActual };
   };
+
+  // Function to handle the total savings from BudgetSummary
+  const handleTotalSavings = (total: number) => {
+    setTotalSavings(total);
+  };
+
+  const totals = calculateTotals();
 
   return (
     <div className="container py-8 max-w-4xl">
@@ -202,7 +210,10 @@ const PayPeriod = () => {
 
       {/* 2. BUDGET OVERVIEW SECTION */}
       <BudgetSection title="BUDGET OVERVIEW">
-        <BudgetGraphs {...calculateTotals()} />
+        <BudgetGraphs 
+          {...totals} 
+          totalSavings={totalSavings} 
+        />
       </BudgetSection>
 
       {/* 3 & 4. SUMMARY AND CATEGORIES SECTIONS - SIDE BY SIDE */}
@@ -220,6 +231,7 @@ const PayPeriod = () => {
             setRollover={(checked: boolean) => 
               setPeriodData(prev => ({ ...prev, rollover: checked }))
             }
+            onTotalChange={handleTotalSavings}
           />
         </BudgetSection>
 

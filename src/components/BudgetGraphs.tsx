@@ -15,17 +15,24 @@ interface BudgetGraphsProps {
   totalIncome: number;
   totalBudgeted: number;
   totalActual: number;
+  totalSavings: number; // New prop to receive the total savings from BudgetSummary
 }
 
-const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsProps) => {
+const BudgetGraphs = ({ 
+  totalIncome, 
+  totalBudgeted, 
+  totalActual, 
+  totalSavings 
+}: BudgetGraphsProps) => {
   const { currency, setCurrency, convertAmount, getCurrencySymbol } = useCurrency();
 
-  // Calculate leftToBudget - this should be income minus all liabilities (totalBudgeted)
-  const leftToBudget = Math.max(0, totalIncome - totalBudgeted);
+  // Use the totalSavings passed from BudgetSummary for left to budget
+  const leftToBudget = Math.max(0, totalSavings);
   
   // Calculate leftToSpend - this is the total budgeted amount minus actual spending
   const leftToSpend = Math.max(0, totalBudgeted - totalActual);
 
+  // Calculate percentages
   const budgetPercentage = totalIncome > 0 
     ? Math.min(100, Math.round((leftToBudget / totalIncome) * 100)) 
     : 0;
