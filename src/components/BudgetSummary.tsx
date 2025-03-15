@@ -104,6 +104,12 @@ const BudgetSummary = ({
   // Get total income for percentage calculations
   const totalBudget = summaryData.income?.budget || 0;
 
+  // Ensure we always have at least rollover for display
+  const displayData = { ...summaryData };
+  if (!('rollover' in displayData)) {
+    displayData.rollover = { budget: 0, actual: 0 };
+  }
+
   return (
     <div className="space-y-4">
       {/* Column headers */}
@@ -128,11 +134,11 @@ const BudgetSummary = ({
       </Button>
 
       {/* Budget rows for each category */}
-      {Object.entries(summaryData).map(([key, value], index) => (
+      {Object.entries(displayData).map(([key, value], index) => (
         <div key={key} className="flex items-center gap-2">
           <div className="flex-grow">
             <BudgetRow
-              label={key === 'rollover' ? 'ROLLOVER' : key.toUpperCase()}
+              label={key === 'rollover' ? 'ROLLOVER' : key.replace(/_/g, ' ').toUpperCase()}
               budgetValue={value.budget}
               actualValue={value.actual}
               onBudgetChange={(newValue) => {
@@ -168,8 +174,10 @@ const BudgetSummary = ({
               variant="ghost"
               size="icon"
               onClick={() => {
-                const { [key]: removed, ...rest } = summaryData;
-                setSummaryData(rest);
+                setSummaryData(prev => {
+                  const { [key]: removed, ...rest } = prev;
+                  return rest;
+                });
               }}
               className="h-8 w-8 ml-1 flex-shrink-0"
             >

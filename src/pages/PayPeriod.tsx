@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BudgetSection from "@/components/BudgetSection";
@@ -36,17 +35,13 @@ interface PeriodData {
   rollover: boolean;
 }
 
+// Only include rollover as default
 const DEFAULT_SUMMARY_DATA: SummaryData = {
-  rollover: { budget: 0, actual: 0 },
-  income: { budget: 0, actual: 0 },
-  savings: { budget: 0, actual: 0 },
-  investments: { budget: 0, actual: 0 },
-  bills: { budget: 0, actual: 0 },
-  expenses: { budget: 0, actual: 0 },
-  debt: { budget: 0, actual: 0 }
+  rollover: { budget: 0, actual: 0 }
 };
 
-const DEFAULT_CATEGORIES = ['income', 'savings', 'investments', 'bills', 'expenses', 'debt'];
+// Empty array for default categories
+const DEFAULT_CATEGORIES: string[] = [];
 
 const PayPeriod = () => {
   const { id } = useParams();
@@ -67,14 +62,11 @@ const PayPeriod = () => {
       setEditedName(parsed.name || "");
       setEditedDescription(parsed.description || "");
       
-      // Ensure all default categories exist
-      const summaryData = parsed.summaryData || DEFAULT_SUMMARY_DATA;
+      // Ensure rollover exists
+      const summaryData = parsed.summaryData || { rollover: { budget: 0, actual: 0 } };
+      
+      // Create empty categories object if not present
       const categoryItems = parsed.categoryItems || {};
-      DEFAULT_CATEGORIES.forEach(category => {
-        if (!categoryItems[category]) {
-          categoryItems[category] = [];
-        }
-      });
       
       return {
         ...parsed,
@@ -88,10 +80,7 @@ const PayPeriod = () => {
       startDate: undefined,
       endDate: undefined,
       summaryData: DEFAULT_SUMMARY_DATA,
-      categoryItems: DEFAULT_CATEGORIES.reduce((acc, category) => {
-        acc[category] = [];
-        return acc;
-      }, {} as CategoryItems),
+      categoryItems: {},
       rollover: false,
     };
   });
@@ -110,6 +99,7 @@ const PayPeriod = () => {
   };
 
   const calculateTotals = () => {
+    // Find income in the summaryData if it exists
     const income = periodData.summaryData.income?.budget || 0;
     const totalIncome = income;
     
