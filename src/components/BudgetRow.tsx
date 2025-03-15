@@ -12,11 +12,12 @@ interface BudgetRowProps {
   actualValue: number;
   onBudgetChange: (value: number) => void;
   onActualChange: (value: number) => void;
-  onLabelChange?: (value: string) => void; // New prop for label change
+  onLabelChange?: (value: string) => void;
   isCheckbox?: boolean;
   checked?: boolean;
   onCheckChange?: (checked: boolean) => void;
   index?: number;
+  isEditingLabel?: boolean; // Add prop to control label editing state
 }
 
 const BudgetRow = ({
@@ -30,11 +31,12 @@ const BudgetRow = ({
   checked,
   onCheckChange,
   index = 0,
+  isEditingLabel = false, // Default to false if not provided
 }: BudgetRowProps) => {
   const { getCurrencySymbol, convertAmount } = useCurrency();
   const [budgetInput, setBudgetInput] = useState(budgetValue.toString());
   const [actualInput, setActualInput] = useState(actualValue.toString());
-  const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [isEditingLabelState, setIsEditingLabelState] = useState(isEditingLabel);
   const [labelInput, setLabelInput] = useState(label);
   
   // Generate unique IDs for each input to associate with labels
@@ -48,6 +50,11 @@ const BudgetRow = ({
     setActualInput(actualValue.toString());
     setLabelInput(label);
   }, [budgetValue, actualValue, label]);
+
+  // Sync the internal editing state with the prop
+  useEffect(() => {
+    setIsEditingLabelState(isEditingLabel);
+  }, [isEditingLabel]);
 
   const handleInputBlur = (value: string, onChange: (value: number) => void) => {
     const numericValue = parseFloat(value) || 0;
@@ -75,7 +82,7 @@ const BudgetRow = ({
     if (onLabelChange && labelInput !== label) {
       onLabelChange(labelInput);
     }
-    setIsEditingLabel(false);
+    setIsEditingLabelState(false);
   };
 
   const handleLabelKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -83,7 +90,7 @@ const BudgetRow = ({
       handleLabelChange();
     } else if (e.key === 'Escape') {
       setLabelInput(label);
-      setIsEditingLabel(false);
+      setIsEditingLabelState(false);
     }
   };
 
@@ -138,7 +145,7 @@ const BudgetRow = ({
             aria-labelledby={labelId}
           />
         )}
-        {isEditingLabel && onLabelChange ? (
+        {isEditingLabelState && onLabelChange ? (
           <div className="flex items-center gap-1 w-full">
             <Input
               value={labelInput}
@@ -168,7 +175,7 @@ const BudgetRow = ({
             </Label>
             {onLabelChange && label !== "TOTAL" && (
               <button 
-                onClick={() => setIsEditingLabel(true)} 
+                onClick={() => setIsEditingLabelState(true)} 
                 className="text-gray-400 hover:text-gray-600 ml-1"
                 aria-label={`Edit ${label} label`}
               >

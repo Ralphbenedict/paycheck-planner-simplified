@@ -10,14 +10,15 @@ interface CategoryItem {
   label: string;
   budget: number;
   actual: number;
+  isEditing?: boolean; // Add isEditing flag to track new items
 }
 
 interface CategoryTabProps {
   title: string;
   items: CategoryItem[];
   onItemsChange: (items: CategoryItem[]) => void;
-  summaryBudget?: number; // Add summary budget value from parent
-  summaryActual?: number; // Add summary actual value from parent
+  summaryBudget?: number;
+  summaryActual?: number;
 }
 
 const CategoryTab = ({ 
@@ -35,6 +36,7 @@ const CategoryTab = ({
       label: "New Item",
       budget: 0,
       actual: 0,
+      isEditing: true // Set isEditing to true for new items
     };
     onItemsChange([...items, newItem]);
   };
@@ -87,8 +89,9 @@ const CategoryTab = ({
               actualValue={item.actual}
               onBudgetChange={(value) => updateItem(item.id, { budget: value })}
               onActualChange={(value) => updateItem(item.id, { actual: value })}
-              onLabelChange={(value) => updateItem(item.id, { label: value })}
+              onLabelChange={(value) => updateItem(item.id, { label: value, isEditing: false })}
               index={index}
+              isEditingLabel={item.isEditing} // Pass isEditing flag to BudgetRow
             />
           </div>
           <Button
