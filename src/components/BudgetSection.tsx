@@ -11,6 +11,7 @@ interface BudgetSectionProps {
   onEdit?: () => void;
   editable?: boolean;
   hideTitle?: boolean;
+  rightElement?: React.ReactNode; // Add prop for right element in header
 }
 
 const BudgetSection = ({ 
@@ -19,7 +20,8 @@ const BudgetSection = ({
   children,
   onEdit,
   editable = false,
-  hideTitle = false
+  hideTitle = false,
+  rightElement
 }: BudgetSectionProps) => {
   return (
     <div className={cn(
@@ -32,16 +34,21 @@ const BudgetSection = ({
       className
     )}>
       {!hideTitle && (
-        <div className="flex items-center gap-2 mb-4">
-          <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
-          {editable && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onEdit}
-            >
-              <Pencil className="h-4 w-4" />
-            </Button>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
+            {editable && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onEdit}
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          {rightElement && (
+            <div>{rightElement}</div>
           )}
         </div>
       )}

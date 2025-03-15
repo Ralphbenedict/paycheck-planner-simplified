@@ -10,6 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Pencil, Check, X } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useCurrency, CurrencyCode } from "@/contexts/CurrencyContext";
 
 interface CategoryItem {
   id: string;
@@ -47,6 +55,7 @@ const DEFAULT_CATEGORIES: string[] = [];
 const PayPeriod = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { currency, setCurrency } = useCurrency();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
@@ -209,7 +218,32 @@ const PayPeriod = () => {
       </BudgetSection>
 
       {/* 2. BUDGET OVERVIEW SECTION */}
-      <BudgetSection title="BUDGET OVERVIEW">
+      <BudgetSection 
+        title="BUDGET OVERVIEW"
+        rightElement={
+          <Select 
+            value={currency} 
+            onValueChange={(value) => setCurrency(value as CurrencyCode)}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="Select currency" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="USD">USD ($)</SelectItem>
+              <SelectItem value="EUR">EUR (€)</SelectItem>
+              <SelectItem value="GBP">GBP (£)</SelectItem>
+              <SelectItem value="CAD">CAD (C$)</SelectItem>
+              <SelectItem value="JPY">JPY (¥)</SelectItem>
+              <SelectItem value="PHP">PHP (₱)</SelectItem>
+              <SelectItem value="SGD">SGD (S$)</SelectItem>
+              <SelectItem value="MYR">MYR (RM)</SelectItem>
+              <SelectItem value="THB">THB (฿)</SelectItem>
+              <SelectItem value="IDR">IDR (Rp)</SelectItem>
+              <SelectItem value="VND">VND (₫)</SelectItem>
+            </SelectContent>
+          </Select>
+        }
+      >
         <BudgetGraphs 
           {...totals} 
           totalSavings={totalSavings} 

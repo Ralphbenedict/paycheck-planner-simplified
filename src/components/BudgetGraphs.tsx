@@ -2,14 +2,7 @@
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Separator } from "@/components/ui/separator";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCurrency, CurrencyCode, CURRENCY_SYMBOLS } from "@/contexts/CurrencyContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface BudgetGraphsProps {
   totalIncome: number;
@@ -24,7 +17,7 @@ const BudgetGraphs = ({
   totalActual, 
   totalSavings 
 }: BudgetGraphsProps) => {
-  const { currency, setCurrency, convertAmount, getCurrencySymbol } = useCurrency();
+  const { convertAmount, getCurrencySymbol } = useCurrency();
 
   // Use the totalSavings passed from BudgetSummary for left to budget
   const leftToBudget = Math.max(0, totalSavings);
@@ -88,35 +81,10 @@ const BudgetGraphs = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-end mb-2">
-        <Select 
-          value={currency} 
-          onValueChange={(value) => setCurrency(value as CurrencyCode)}
-        >
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Select currency" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="USD">USD ($)</SelectItem>
-            <SelectItem value="EUR">EUR (€)</SelectItem>
-            <SelectItem value="GBP">GBP (£)</SelectItem>
-            <SelectItem value="CAD">CAD (C$)</SelectItem>
-            <SelectItem value="JPY">JPY (¥)</SelectItem>
-            
-            <SelectItem value="PHP">PHP (₱)</SelectItem>
-            <SelectItem value="SGD">SGD (S$)</SelectItem>
-            <SelectItem value="MYR">MYR (RM)</SelectItem>
-            <SelectItem value="THB">THB (฿)</SelectItem>
-            <SelectItem value="IDR">IDR (Rp)</SelectItem>
-            <SelectItem value="VND">VND (₫)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-12 relative">
+    <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
         {renderGraph("LEFT TO BUDGET", convertedLeftToBudget, budgetPercentage, "#1EAEDB", "#FDE1D3")}
-        <div className="hidden md:block absolute left-1/2 top-12 bottom-12 -translate-x-1/2">
+        <div className="hidden md:block absolute left-1/2 top-0 bottom-0 -translate-x-1/2">
           <Separator orientation="vertical" />
         </div>
         {renderGraph("LEFT TO SPEND", convertedLeftToSpend, spendPercentage, "#F97316", "#D3E4FD")}
