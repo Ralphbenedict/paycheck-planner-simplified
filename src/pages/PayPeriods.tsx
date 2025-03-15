@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,20 +49,12 @@ interface SummaryData {
   [key: string]: { budget: number; actual: number };
 }
 
-// Initialize summary data with zero values for all categories
+// Initialize with only rollover
 const DEFAULT_SUMMARY_DATA: SummaryData = {
-  rollover: { budget: 0, actual: 0 },    // Previous period's remaining balance
-  income: { budget: 0, actual: 0 },      // Expected and actual income
-  savings: { budget: 0, actual: 0 },     // Planned and actual savings
-  investments: { budget: 0, actual: 0 },  // Investment allocations
-  bills: { budget: 0, actual: 0 },       // Fixed monthly expenses
-  expenses: { budget: 0, actual: 0 },    // Variable expenses
-  debt: { budget: 0, actual: 0 }         // Debt payments
+  rollover: { budget: 0, actual: 0 }
 };
 
-// Main categories available for budget planning
-const DEFAULT_CATEGORIES = ['income', 'savings', 'investments', 'bills', 'expenses', 'debt'];
-
+// Main component for displaying and managing budget periods
 const PayPeriods = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -142,10 +133,7 @@ const PayPeriods = () => {
         startDate: undefined,
         endDate: undefined,
         summaryData: DEFAULT_SUMMARY_DATA,
-        categoryItems: DEFAULT_CATEGORIES.reduce((acc, category) => {
-          acc[category] = [];
-          return acc;
-        }, {} as CategoryItems),
+        categoryItems: {},
         rollover: false,
         collaborators: data.collaborators || [],
       }));

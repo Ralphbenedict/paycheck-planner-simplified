@@ -104,11 +104,18 @@ const BudgetSummary = ({
   // Get total income for percentage calculations
   const totalBudget = summaryData.income?.budget || 0;
 
-  // Ensure we always have at least rollover for display
-  const displayData = { ...summaryData };
-  if (!('rollover' in displayData)) {
+  // Create a clean displayData object with ONLY rollover guaranteed
+  const displayData: SummaryData = {};
+  
+  // Only add rollover if it doesn't exist
+  if (!summaryData.rollover) {
     displayData.rollover = { budget: 0, actual: 0 };
   }
+  
+  // Add all existing items from summaryData
+  Object.entries(summaryData).forEach(([key, value]) => {
+    displayData[key] = value;
+  });
 
   return (
     <div className="space-y-4">
