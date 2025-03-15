@@ -36,6 +36,11 @@ const BudgetRow = ({
   const [actualInput, setActualInput] = useState(actualValue.toString());
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [labelInput, setLabelInput] = useState(label);
+  
+  // Generate unique IDs for each input to associate with labels
+  const budgetInputId = `budget-input-${label.replace(/\s+/g, '-').toLowerCase()}-${index}`;
+  const actualInputId = `actual-input-${label.replace(/\s+/g, '-').toLowerCase()}-${index}`;
+  const labelId = `row-label-${label.replace(/\s+/g, '-').toLowerCase()}-${index}`;
 
   // Update local state when prop values change
   useEffect(() => {
@@ -129,6 +134,8 @@ const BudgetRow = ({
             checked={checked}
             onChange={(e) => onCheckChange?.(e.target.checked)}
             className="w-4 h-4"
+            id={`checkbox-${labelId}`}
+            aria-labelledby={labelId}
           />
         )}
         {isEditingLabel && onLabelChange ? (
@@ -140,23 +147,30 @@ const BudgetRow = ({
               onKeyDown={handleLabelKeyDown}
               className="h-8 py-1"
               autoFocus
+              id={labelId}
             />
             <button 
               onClick={handleLabelChange}
               className="text-gray-500 hover:text-gray-700"
+              aria-label="Save label changes"
             >
               <Check className="h-4 w-4" />
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-1 w-full">
-            <Label className={label === "TOTAL" ? "font-semibold" : ""}>
+            <Label 
+              className={label === "TOTAL" ? "font-semibold" : ""}
+              id={labelId}
+              htmlFor={isCheckbox ? `checkbox-${labelId}` : budgetInputId}
+            >
               {label}
             </Label>
             {onLabelChange && label !== "TOTAL" && (
               <button 
                 onClick={() => setIsEditingLabel(true)} 
                 className="text-gray-400 hover:text-gray-600 ml-1"
+                aria-label={`Edit ${label} label`}
               >
                 <Pencil className="h-3 w-3" />
               </button>
@@ -178,6 +192,9 @@ const BudgetRow = ({
             "font-semibold": label === "TOTAL",
           })}
           readOnly={label === "TOTAL"}
+          id={budgetInputId}
+          aria-labelledby={labelId}
+          aria-label={`Budget for ${label}`}
         />
       </div>
       <div className={cn("col-span-4", styles.actual)}>
@@ -194,6 +211,9 @@ const BudgetRow = ({
             "font-semibold": label === "TOTAL",
           })}
           readOnly={label === "TOTAL"}
+          id={actualInputId}
+          aria-labelledby={labelId}
+          aria-label={`Actual spending for ${label}`}
         />
       </div>
     </div>
