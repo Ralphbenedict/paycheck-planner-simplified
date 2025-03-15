@@ -4,6 +4,7 @@ import BudgetRow from "./BudgetRow";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Plus, Trash2 } from "lucide-react";
+import AddBudgetItemDialog from "./AddBudgetItemDialog";
 
 // Interface for tracking budget and actual amounts by category
 interface SummaryData {
@@ -24,24 +25,9 @@ const BudgetSummary = ({
   rollover,
   setRollover,
 }: BudgetSummaryProps) => {
-  // State for adding new budget categories
-  const [isAddingNew, setIsAddingNew] = useState(false);
-  const [newItemLabel, setNewItemLabel] = useState("");
-
-  // Handler for adding new budget categories
-  const handleAddNewItem = () => {
-    if (!newItemLabel.trim()) return;
-    
-    // Convert category name to snake_case for consistency
-    const key = newItemLabel.toLowerCase().replace(/\s+/g, '_');
-    setSummaryData(prev => ({
-      ...prev,
-      [key]: { budget: 0, actual: 0 }  // Initialize with zero values
-    }));
-    setNewItemLabel("");
-    setIsAddingNew(false);
-  };
-
+  // Dialog state
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   // Handler for renaming categories
   const handleLabelChange = (oldKey: string, newLabel: string) => {
     // Don't allow changing the label for rollover
@@ -77,6 +63,47 @@ const BudgetSummary = ({
     }, { budget: 0, actual: 0 });
   };
 
+  // Handler for adding new budget item with allocations
+  const handleAddBudgetItem = (item: { 
+    label: string, 
+    budget: number, 
+    allocations: {[key: string]: number} 
+  }) => {
+    const { label, budget, allocations } = item;
+    const itemKey = label.toLowerCase().replace(/\s+/g, '_');
+    
+    // Update summary with new item
+    setSummaryData(prev => ({
+      ...prev,
+      [itemKey]: { budget, actual: 0 }
+    }));
+    
+    // Apply allocations to existing categories
+    Object.entries(allocations).forEach(([category, percentage]) => {
+      const categoryKey = category.toLowerCase().replace(/\s+/g, '_');
+      const allocationAmount = (budget * percentage) / 100;
+      
+      if (categoryKey in prev) {
+        setSummaryData(prev => ({
+          ...prev,
+          [categoryKey]: {
+            ...prev[categoryKey],
+            budget: prev[categoryKey].budget + allocationAmount
+          }
+        }));
+      } else if (percentage > 0) {
+        // Create new category if it doesn't exist but has allocation
+        setSummaryData(prev => ({
+          ...prev,
+          [categoryKey]: { budget: allocationAmount, actual: 0 }
+        }));
+      }
+    });
+  };
+
+  // Get total income for percentage calculations
+  const totalBudget = summaryData.income?.budget || 0;
+
   return (
     <div className="space-y-4">
       {/* Column headers */}
@@ -90,48 +117,22 @@ const BudgetSummary = ({
         </div>
       </div>
       
-      {/* Add New Item button - MOVED HERE */}
-      {isAddingNew ? (
-        <div className="flex items-center gap-2 mb-4">
-          <Input
-            value={newItemLabel}
-            onChange={(e) => setNewItemLabel(e.target.value)}
-            placeholder="Enter item name"
-            className="flex-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleAddNewItem();
-              if (e.key === 'Escape') setIsAddingNew(false);
-            }}
-          />
-          <Button onClick={handleAddNewItem} size="sm">Add</Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => {
-              setIsAddingNew(false);
-              setNewItemLabel("");
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
-      ) : (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsAddingNew(true)}
-          className="mb-4"
-        >
-          <Plus className="h-4 w-4 mr-2" /> Add New Item
-        </Button>
-      )}
+      {/* Add New Item button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setDialogOpen(true)}
+        className="mb-4"
+      >
+        <Plus className="h-4 w-4 mr-2" /> Add New Item
+      </Button>
 
       {/* Budget rows for each category */}
       {Object.entries(summaryData).map(([key, value], index) => (
         <div key={key} className="flex items-center gap-2">
           <div className="flex-grow">
             <BudgetRow
-              label={key.toUpperCase()}
+              label={key === 'rollover' ? 'ROLLOVER' : key.toUpperCase()}
               budgetValue={value.budget}
               actualValue={value.actual}
               onBudgetChange={(newValue) => {
@@ -147,7 +148,7 @@ const BudgetSummary = ({
                 }));
               }}
               onLabelChange={
-                key !== 'rollover' 
+                key !== 'rollover' && key !== 'total'
                   ? (newLabel) => handleLabelChange(key, newLabel)
                   : undefined
               }
@@ -162,7 +163,7 @@ const BudgetSummary = ({
             />
           </div>
           {/* Allow deletion of custom categories */}
-          {key !== 'rollover' && (
+          {key !== 'rollover' && key !== 'total' && (
             <Button
               variant="ghost"
               size="icon"
@@ -176,7 +177,7 @@ const BudgetSummary = ({
             </Button>
           )}
           {/* Add an empty div with the same width as the button to maintain alignment */}
-          {key === 'rollover' && (
+          {(key === 'rollover' || key === 'total') && (
             <div className="w-8 h-8 ml-1 flex-shrink-0"></div>
           )}
         </div>
@@ -192,6 +193,14 @@ const BudgetSummary = ({
           onActualChange={() => {}}
         />
       </div>
+
+      {/* Add Budget Item Dialog */}
+      <AddBudgetItemDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSave={handleAddBudgetItem}
+        totalBudget={totalBudget}
+      />
     </div>
   );
 };

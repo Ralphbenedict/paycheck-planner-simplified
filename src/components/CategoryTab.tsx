@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import BudgetRow from "./BudgetRow";
 import { Button } from "./ui/button";
 import { Plus, Trash2 } from "lucide-react";
@@ -19,7 +19,7 @@ interface CategoryTabProps {
 }
 
 const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
-  const { getCurrencySymbol, convertAmount } = useCurrency();
+  const { getCurrencySymbol } = useCurrency();
   
   const addItem = () => {
     const newItem: CategoryItem = {
@@ -59,6 +59,16 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
         </div>
       </div>
 
+      {/* Add Item button */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={addItem}
+        className="mb-4"
+      >
+        <Plus className="h-4 w-4 mr-2" /> Add Item
+      </Button>
+
       {items.map((item, index) => (
         <div key={item.id} className="flex items-center gap-2">
           <div className="flex-grow">
@@ -83,43 +93,16 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
         </div>
       ))}
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={addItem}
-        className="mt-2"
-      >
-        <Plus className="h-4 w-4 mr-2" /> Add Item
-      </Button>
-
       <div className="border-t pt-4 mt-4">
         <div className="flex items-center">
           <div className="flex-grow">
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-4">
-                <h3 className="font-semibold">BALANCE</h3>
-              </div>
-              <div className="col-span-4">
-                <div className="bg-gray-50 rounded-md relative">
-                  <input
-                    type="text"
-                    value={`${currencySymbol}${totalBudget.toFixed(2)}`}
-                    readOnly
-                    className="w-full px-3 py-2 text-right bg-transparent font-semibold"
-                  />
-                </div>
-              </div>
-              <div className="col-span-4">
-                <div className="bg-gray-50 rounded-md relative">
-                  <input
-                    type="text"
-                    value={`${currencySymbol}${totalActual.toFixed(2)}`}
-                    readOnly
-                    className="w-full px-3 py-2 text-right bg-transparent font-semibold"
-                  />
-                </div>
-              </div>
-            </div>
+            <BudgetRow
+              label="TOTAL"
+              budgetValue={totalBudget}
+              actualValue={totalActual}
+              onBudgetChange={() => {}}
+              onActualChange={() => {}}
+            />
           </div>
         </div>
       </div>
