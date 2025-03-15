@@ -22,12 +22,6 @@ const AddBudgetItemDialog = ({
   const [itemName, setItemName] = useState("");
   const [itemBudget, setItemBudget] = useState("");
   
-  // Default allocation categories
-  const defaultCategories = ["Saving", "Investments", "Expenses"];
-  const [allocations, setAllocations] = useState<{[key: string]: string}>(
-    defaultCategories.reduce((acc, category) => ({...acc, [category]: ""}), {})
-  );
-  
   // State for custom allocations
   const [customAllocations, setCustomAllocations] = useState<Array<{name: string, percentage: string}>>([]);
 
@@ -35,42 +29,29 @@ const AddBudgetItemDialog = ({
     // Convert string values to numbers
     const budget = parseFloat(itemBudget) || 0;
     
-    // Convert all allocations (default + custom) to numeric values
-    const allAllocations = {...allocations};
+    // Convert all allocations to numeric values
+    const allAllocations: {[key: string]: number} = {};
     
     // Add custom allocations to the allocation object
     customAllocations.forEach(allocation => {
       if (allocation.name.trim()) {
-        allAllocations[allocation.name.trim()] = allocation.percentage;
+        allAllocations[allocation.name.trim()] = parseFloat(allocation.percentage) || 0;
       }
     });
-    
-    const numericAllocations = Object.entries(allAllocations).reduce((acc, [key, value]) => {
-      const percentage = parseFloat(value) || 0;
-      return {...acc, [key.toLowerCase()]: percentage};
-    }, {});
     
     onSave({
       label: itemName,
       budget,
-      allocations: numericAllocations
+      allocations: allAllocations
     });
     
     // Reset form
     setItemName("");
     setItemBudget("");
-    setAllocations(defaultCategories.reduce((acc, category) => ({...acc, [category]: ""}), {}));
     setCustomAllocations([]);
     
     // Close dialog
     onOpenChange(false);
-  };
-
-  const handleAllocationChange = (category: string, value: string) => {
-    // Only allow numbers and decimal points
-    if (value === "" || /^\d*\.?\d*$/.test(value)) {
-      setAllocations(prev => ({...prev, [category]: value}));
-    }
   };
   
   const handleCustomAllocationChange = (index: number, field: 'name' | 'percentage', value: string) => {
@@ -131,71 +112,51 @@ const AddBudgetItemDialog = ({
             />
           </div>
           
-          {defaultCategories.map((category) => (
-            <div key={category} className="grid grid-cols-2 gap-4">
-              <div>
-                <Input
-                  value={category}
-                  readOnly
-                  className="bg-gray-50"
-                />
-              </div>
-              <div className="relative">
-                <Input
-                  value={allocations[category]}
-                  onChange={(e) => handleAllocationChange(category, e.target.value)}
-                  placeholder="0"
-                />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  % from Total Budget
-                </span>
-              </div>
-            </div>
-          ))}
-          
           {/* Custom allocations section */}
-          {customAllocations.map((allocation, index) => (
-            <div key={index} className="grid grid-cols-2 gap-4 relative">
-              <div>
+          <div className="mt-4 border-t pt-4">
+            <Label className="mb-2 block">Allocations</Label>
+            
+            {customAllocations.map((allocation, index) => (
+              <div key={index} className="grid grid-cols-[1fr,120px,auto] gap-2 mb-2 items-center">
                 <Input
                   value={allocation.name}
                   onChange={(e) => handleCustomAllocationChange(index, 'name', e.target.value)}
                   placeholder="Category name"
                 />
-              </div>
-              <div className="relative">
-                <Input
-                  value={allocation.percentage}
-                  onChange={(e) => handleCustomAllocationChange(index, 'percentage', e.target.value)}
-                  placeholder="0"
-                />
-                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                  % from Total Budget
-                </span>
+                <div className="relative">
+                  <Input
+                    value={allocation.percentage}
+                    onChange={(e) => handleCustomAllocationChange(index, 'percentage', e.target.value)}
+                    placeholder="0"
+                    className="pr-6"
+                  />
+                  <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500">
+                    %
+                  </span>
+                </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   type="button"
                   onClick={() => removeCustomAllocation(index)}
-                  className="absolute -right-8 top-1/2 transform -translate-y-1/2"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
+            ))}
+            
+            {/* Add allocation button - left aligned */}
+            <div className="flex justify-start mt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={addCustomAllocation}
+                className="flex items-center"
+              >
+                <Plus className="h-4 w-4 mr-2" /> Add Allocation
+              </Button>
             </div>
-          ))}
-          
-          {/* Add allocation button - left aligned */}
-          <div className="flex justify-start mt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              type="button"
-              onClick={addCustomAllocation}
-              className="flex items-center"
-            >
-              <Plus className="h-4 w-4 mr-2" /> Add Allocation
-            </Button>
           </div>
         </div>
         
