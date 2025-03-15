@@ -22,16 +22,22 @@ interface CategoryItems {
   [key: string]: CategoryItem[];
 }
 
+interface SummaryData {
+  [key: string]: { budget: number; actual: number };
+}
+
 interface CategoriesProps {
   categoryItems: CategoryItems;
   setCategoryItems: React.Dispatch<React.SetStateAction<CategoryItems>>;
   availableCategories?: Array<{ key: string; label: string }>;
+  summaryData?: SummaryData; // Add summaryData prop
 }
 
 const Categories = ({ 
   categoryItems = {}, // Provide default empty object
   setCategoryItems,
-  availableCategories = [] // Provide default empty array
+  availableCategories = [], // Provide default empty array
+  summaryData = {} // Provide default empty object for summaryData
 }: CategoriesProps) => {
   // Ensure we have valid categories, defaulting to an empty array if needed
   const categories = availableCategories.length > 0 
@@ -60,6 +66,9 @@ const Categories = ({
   }
 
   const activeLabel = displayCategories.find(cat => cat.key === activeCategory)?.label || "";
+  
+  // Get budget and actual totals from summaryData for the active category
+  const activeCategoryData = summaryData[activeCategory] || { budget: 0, actual: 0 };
 
   return (
     <div className="w-full space-y-4">
@@ -88,6 +97,8 @@ const Categories = ({
                 title={label}
                 items={categoryItems[key] || []}
                 onItemsChange={(newItems) => handleItemsChange(key, newItems)}
+                summaryBudget={activeCategoryData.budget}
+                summaryActual={activeCategoryData.actual}
               />
             </div>
           ))}

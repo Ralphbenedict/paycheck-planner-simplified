@@ -248,6 +248,7 @@ const PayPeriod = () => {
               key,
               label: key.charAt(0).toUpperCase() + key.slice(1)
             }))}
+            summaryData={periodData.summaryData} // Pass the summaryData to Categories
           />
         </BudgetSection>
       </div>

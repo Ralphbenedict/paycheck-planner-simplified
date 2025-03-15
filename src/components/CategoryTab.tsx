@@ -16,9 +16,17 @@ interface CategoryTabProps {
   title: string;
   items: CategoryItem[];
   onItemsChange: (items: CategoryItem[]) => void;
+  summaryBudget?: number; // Add summary budget value from parent
+  summaryActual?: number; // Add summary actual value from parent
 }
 
-const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
+const CategoryTab = ({ 
+  title, 
+  items, 
+  onItemsChange, 
+  summaryBudget, 
+  summaryActual 
+}: CategoryTabProps) => {
   const { getCurrencySymbol } = useCurrency();
   
   const addItem = () => {
@@ -43,8 +51,9 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
     );
   };
 
-  const totalBudget = items.reduce((sum, item) => sum + item.budget, 0);
-  const totalActual = items.reduce((sum, item) => sum + item.actual, 0);
+  // Use summary values if provided, otherwise calculate from items
+  const totalBudget = summaryBudget !== undefined ? summaryBudget : items.reduce((sum, item) => sum + item.budget, 0);
+  const totalActual = summaryActual !== undefined ? summaryActual : items.reduce((sum, item) => sum + item.actual, 0);
   const currencySymbol = getCurrencySymbol();
 
   return (
