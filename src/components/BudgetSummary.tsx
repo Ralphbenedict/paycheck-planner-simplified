@@ -83,7 +83,7 @@ const BudgetSummary = ({
       const categoryKey = category.toLowerCase().replace(/\s+/g, '_');
       const allocationAmount = (budget * percentage) / 100;
       
-      if (categoryKey in prev) {
+      if (categoryKey in summaryData) {
         setSummaryData(prev => ({
           ...prev,
           [categoryKey]: {
