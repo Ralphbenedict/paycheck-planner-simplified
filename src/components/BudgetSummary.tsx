@@ -42,6 +42,26 @@ const BudgetSummary = ({
     setIsAddingNew(false);
   };
 
+  // Handler for renaming categories
+  const handleLabelChange = (oldKey: string, newLabel: string) => {
+    // Don't allow changing the label for rollover
+    if (oldKey === 'rollover') return;
+    
+    // Convert new label to key format
+    const newKey = newLabel.toLowerCase().replace(/\s+/g, '_');
+    
+    // Skip if key already exists or if nothing changed
+    if (newKey === oldKey || (newKey !== oldKey && summaryData[newKey])) return;
+    
+    setSummaryData(prev => {
+      const { [oldKey]: oldValue, ...rest } = prev;
+      return {
+        ...rest,
+        [newKey]: oldValue
+      };
+    });
+  };
+
   // Calculate total budget and actual amounts
   const calculateTotal = () => {
     return Object.entries(summaryData).reduce((acc, [key, value]) => {
@@ -107,7 +127,7 @@ const BudgetSummary = ({
       )}
 
       {/* Budget rows for each category */}
-      {Object.entries(summaryData).map(([key, value]) => (
+      {Object.entries(summaryData).map(([key, value], index) => (
         <div key={key} className="flex items-center gap-2">
           <div className="flex-grow">
             <BudgetRow
@@ -126,6 +146,11 @@ const BudgetSummary = ({
                   [key]: { ...prev[key], actual: newValue }
                 }));
               }}
+              onLabelChange={
+                key !== 'rollover' 
+                  ? (newLabel) => handleLabelChange(key, newLabel)
+                  : undefined
+              }
               isCheckbox={key === 'rollover'}
               checked={key === 'rollover' ? rollover : undefined}
               onCheckChange={
@@ -133,6 +158,7 @@ const BudgetSummary = ({
                   ? (checked: boolean) => setRollover(checked)
                   : undefined
               }
+              index={index}
             />
           </div>
           {/* Allow deletion of custom categories */}

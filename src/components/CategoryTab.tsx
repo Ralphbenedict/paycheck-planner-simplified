@@ -68,6 +68,7 @@ const CategoryTab = ({ title, items, onItemsChange }: CategoryTabProps) => {
               actualValue={item.actual}
               onBudgetChange={(value) => updateItem(item.id, { budget: value })}
               onActualChange={(value) => updateItem(item.id, { actual: value })}
+              onLabelChange={(value) => updateItem(item.id, { label: value })}
               index={index}
             />
           </div>

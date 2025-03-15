@@ -4,6 +4,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { cn } from "@/lib/utils";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { Pencil, Check } from "lucide-react";
 
 interface BudgetRowProps {
   label: string;
@@ -11,6 +12,7 @@ interface BudgetRowProps {
   actualValue: number;
   onBudgetChange: (value: number) => void;
   onActualChange: (value: number) => void;
+  onLabelChange?: (value: string) => void; // New prop for label change
   isCheckbox?: boolean;
   checked?: boolean;
   onCheckChange?: (checked: boolean) => void;
@@ -23,6 +25,7 @@ const BudgetRow = ({
   actualValue,
   onBudgetChange,
   onActualChange,
+  onLabelChange,
   isCheckbox = false,
   checked,
   onCheckChange,
@@ -31,12 +34,15 @@ const BudgetRow = ({
   const { getCurrencySymbol, convertAmount } = useCurrency();
   const [budgetInput, setBudgetInput] = useState(budgetValue.toString());
   const [actualInput, setActualInput] = useState(actualValue.toString());
+  const [isEditingLabel, setIsEditingLabel] = useState(false);
+  const [labelInput, setLabelInput] = useState(label);
 
   // Update local state when prop values change
   useEffect(() => {
     setBudgetInput(budgetValue.toString());
     setActualInput(actualValue.toString());
-  }, [budgetValue, actualValue]);
+    setLabelInput(label);
+  }, [budgetValue, actualValue, label]);
 
   const handleInputBlur = (value: string, onChange: (value: number) => void) => {
     const numericValue = parseFloat(value) || 0;
@@ -57,6 +63,22 @@ const BudgetRow = ({
     // Clear the field if it's "0"
     if (e.target.value === "0") {
       e.target.value = "";
+    }
+  };
+
+  const handleLabelChange = () => {
+    if (onLabelChange && labelInput !== label) {
+      onLabelChange(labelInput);
+    }
+    setIsEditingLabel(false);
+  };
+
+  const handleLabelKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLabelChange();
+    } else if (e.key === 'Escape') {
+      setLabelInput(label);
+      setIsEditingLabel(false);
     }
   };
 
@@ -109,7 +131,38 @@ const BudgetRow = ({
             className="w-4 h-4"
           />
         )}
-        <Label className={label === "TOTAL" ? "font-semibold" : ""}>{label}</Label>
+        {isEditingLabel && onLabelChange ? (
+          <div className="flex items-center gap-1 w-full">
+            <Input
+              value={labelInput}
+              onChange={(e) => setLabelInput(e.target.value)}
+              onBlur={handleLabelChange}
+              onKeyDown={handleLabelKeyDown}
+              className="h-8 py-1"
+              autoFocus
+            />
+            <button 
+              onClick={handleLabelChange}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <Check className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 w-full">
+            <Label className={label === "TOTAL" ? "font-semibold" : ""}>
+              {label}
+            </Label>
+            {onLabelChange && label !== "TOTAL" && (
+              <button 
+                onClick={() => setIsEditingLabel(true)} 
+                className="text-gray-400 hover:text-gray-600 ml-1"
+              >
+                <Pencil className="h-3 w-3" />
+              </button>
+            )}
+          </div>
+        )}
       </div>
       <div className={cn("col-span-4", styles.budget)}>
         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
