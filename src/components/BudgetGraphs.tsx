@@ -1,3 +1,4 @@
+
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Separator } from "@/components/ui/separator";
@@ -19,7 +20,10 @@ interface BudgetGraphsProps {
 const BudgetGraphs = ({ totalIncome, totalBudgeted, totalActual }: BudgetGraphsProps) => {
   const { currency, setCurrency, convertAmount, getCurrencySymbol } = useCurrency();
 
+  // Calculate leftToBudget - this should be income minus all liabilities (totalBudgeted)
   const leftToBudget = Math.max(0, totalIncome - totalBudgeted);
+  
+  // Calculate leftToSpend - this is the total budgeted amount minus actual spending
   const leftToSpend = Math.max(0, totalBudgeted - totalActual);
 
   const budgetPercentage = totalIncome > 0 

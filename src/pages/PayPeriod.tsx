@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import BudgetSection from "@/components/BudgetSection";
@@ -103,10 +104,12 @@ const PayPeriod = () => {
     const income = periodData.summaryData.income?.budget || 0;
     const totalIncome = income;
     
+    // Calculate total budgeted - excluding income and rollover
     const totalBudgeted = Object.entries(periodData.summaryData)
       .filter(([key]) => key !== 'income' && key !== 'rollover')
       .reduce((sum, [_, item]) => sum + item.budget, 0);
     
+    // Calculate total actual - excluding income and rollover
     const totalActual = Object.entries(periodData.summaryData)
       .filter(([key]) => key !== 'income' && key !== 'rollover')
       .reduce((sum, [_, item]) => sum + item.actual, 0);
